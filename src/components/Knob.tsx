@@ -26,9 +26,9 @@ export function Knob({
 
 	const value01 = mapTo01Range(value, min, max);
 
-	const minAngle = -145; // The minumum knob position angle, when x = 0
-	const maxAngle = 145; // The maximum knob position angle, when x = 1
-	const angle = ((Math.abs(minAngle) + maxAngle) * value01) + minAngle;
+	const angleMin = -145; // The minumum knob position angle, when x = 0
+	const angleMax = 145; // The maximum knob position angle, when x = 1
+	const angle = mapFrom01Range(value01, angleMin, angleMax);
 
 	const valueText = `${parseFloat(`${value}`).toFixed(2)} ${renderUnit(unit)}`;
 
@@ -40,7 +40,7 @@ export function Knob({
 
 	return (
 		<div
-			className='group flex w-16 select-none flex-col items-center text-sm'
+			className='flex w-16 select-none flex-col items-center text-sm outline-none focus:outline-dashed focus:outline-1 focus:outline-slate-950'
 			tabIndex={0}
 		>
 			<label htmlFor={id}>{title}</label>
@@ -56,12 +56,11 @@ export function Knob({
 				{...bindDrag()}
 			>
 				<div
-					className='absolute h-full w-full rounded-full bg-gray-300 hover:bg-gray-400 group-focus:bg-fuchsia-300'
+					className='absolute h-full w-full rounded-full bg-gray-300'
 				>
-					<div
-						className='absolute bottom-1/2 right-1/2 h-1/2 w-px origin-bottom bg-black'
-						style={{rotate: `${angle}deg`, translate: 1}}
-					/>
+					<div className='absolute h-full w-full' style={{rotate: `${angle}deg`}}>
+						<div className='absolute left-1/2 top-0 h-1/2 w-[2px] -translate-x-1/2 rounded-sm bg-stone-950'/>
+					</div>
 				</div>
 			</div>
 			<label htmlFor={id}>{valueText}</label>
