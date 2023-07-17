@@ -191,7 +191,6 @@ function KnobInput({
 			<input
 				id={id}
 				type='range'
-				defaultValue={valueDefault}
 				min={valueMin}
 				max={valueMax}
 				step={Math.abs(valueMax - valueMin) / 1000}
