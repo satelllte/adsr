@@ -3,29 +3,6 @@ import {useCallback, useEffect, useId, useRef, useState} from 'react';
 import WebAudioRenderer from '@elemaudio/web-renderer';
 import {el, type NodeRepr_t} from '@elemaudio/core';
 
-const GateKey = 'gate';
-const GateDefault = 0;
-
-const AttackKey = 'attack';
-const AttackMin = 0.0001;
-const AttackMax = 60;
-const AttackDefault = 0.001;
-
-const DecayKey = 'decay';
-const DecayMin = 0.0001;
-const DecayMax = 60;
-const DecayDefault = 0.6;
-
-const SustainKey = 'sustain';
-const SustainMin = 0;
-const SustainMax = 1;
-const SustainDefault = 0.7;
-
-const ReleaseKey = 'release';
-const ReleaseMin = 0.0001;
-const ReleaseMax = 60;
-const ReleaseDefault = 0.6;
-
 export default function IndexPage() {
 	const ctxRef = useRef<AudioContext>();
 	const coreRef = useRef<WebAudioRenderer>();
@@ -48,11 +25,36 @@ export default function IndexPage() {
 		})();
 	}, []);
 
-	const gateRef = useRef<NodeRepr_t>(el.const({key: GateKey, value: GateDefault}));
-	const attackRef = useRef<NodeRepr_t>(el.const({key: AttackKey, value: AttackDefault}));
-	const decayRef = useRef<NodeRepr_t>(el.const({key: DecayKey, value: DecayDefault}));
-	const sustainRef = useRef<NodeRepr_t>(el.const({key: SustainKey, value: SustainDefault}));
-	const releaseRef = useRef<NodeRepr_t>(el.const({key: ReleaseKey, value: ReleaseDefault}));
+	const gateKey = 'gate';
+	const gateOff = 0;
+	const gateOn = 1;
+	const gateDefault = gateOff;
+
+	const attackKey = 'attack';
+	const attackMin = 0.0001;
+	const attackMax = 60;
+	const attackDefault = 0.001;
+
+	const decayKey = 'decay';
+	const decayMin = 0.0001;
+	const decayMax = 60;
+	const decayDefault = 0.6;
+
+	const sustainKey = 'sustain';
+	const sustainMin = 0;
+	const sustainMax = 1;
+	const sustainDefault = 0.7;
+
+	const releaseKey = 'release';
+	const releaseMin = 0.0001;
+	const releaseMax = 60;
+	const releaseDefault = 0.6;
+
+	const gateRef = useRef<NodeRepr_t>(el.const({key: gateKey, value: gateDefault}));
+	const attackRef = useRef<NodeRepr_t>(el.const({key: attackKey, value: attackDefault}));
+	const decayRef = useRef<NodeRepr_t>(el.const({key: decayKey, value: decayDefault}));
+	const sustainRef = useRef<NodeRepr_t>(el.const({key: sustainKey, value: sustainDefault}));
+	const releaseRef = useRef<NodeRepr_t>(el.const({key: releaseKey, value: releaseDefault}));
 
 	const renderAudio = async () => {
 		const ctx = ctxRef.current;
@@ -77,12 +79,12 @@ export default function IndexPage() {
 	};
 
 	const play = useCallback(() => {
-		gateRef.current = el.const({key: GateKey, value: 1});
+		gateRef.current = el.const({key: gateKey, value: gateOn});
 		void renderAudio();
 	}, []);
 
 	const stop = useCallback(() => {
-		gateRef.current = el.const({key: GateKey, value: 0});
+		gateRef.current = el.const({key: gateKey, value: gateOff});
 		void renderAudio();
 	}, []);
 
@@ -125,38 +127,38 @@ export default function IndexPage() {
 			</div>
 			<KnobInput
 				title='Attack'
-				valueDefault={AttackDefault}
-				valueMin={AttackMin}
-				valueMax={AttackMax}
+				valueDefault={attackDefault}
+				valueMin={attackMin}
+				valueMax={attackMax}
 				constRef={attackRef}
-				constKey={AttackKey}
+				constKey={attackKey}
 				onChange={renderAudio}
 			/>
 			<KnobInput
 				title='Decay'
-				valueDefault={DecayDefault}
-				valueMin={DecayMin}
-				valueMax={DecayMax}
+				valueDefault={decayDefault}
+				valueMin={decayMin}
+				valueMax={decayMax}
 				constRef={decayRef}
-				constKey={DecayKey}
+				constKey={decayKey}
 				onChange={renderAudio}
 			/>
 			<KnobInput
 				title='Sustain'
-				valueDefault={SustainDefault}
-				valueMin={SustainMin}
-				valueMax={SustainMax}
+				valueDefault={sustainDefault}
+				valueMin={sustainMin}
+				valueMax={sustainMax}
 				constRef={sustainRef}
-				constKey={SustainKey}
+				constKey={sustainKey}
 				onChange={renderAudio}
 			/>
 			<KnobInput
 				title='Release'
-				valueDefault={ReleaseDefault}
-				valueMin={ReleaseMin}
-				valueMax={ReleaseMax}
+				valueDefault={releaseDefault}
+				valueMin={releaseMin}
+				valueMax={releaseMax}
 				constRef={releaseRef}
-				constKey={ReleaseKey}
+				constKey={releaseKey}
 				onChange={renderAudio}
 			/>
 		</div>
