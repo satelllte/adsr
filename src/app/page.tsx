@@ -186,7 +186,7 @@ function KnobInput({
 	const id = useId();
 	const [value, setValue] = useState<number>(valueDefault);
 	return (
-		<div className='flex max-w-sm flex-col'>
+		<div className='flex max-w-sm select-none flex-col'>
 			<label htmlFor={id}>{`${title} | ${value}`}</label>
 			<input
 				id={id}
