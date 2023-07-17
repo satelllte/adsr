@@ -2,8 +2,6 @@
 import {clamp01, mapFrom01Range, mapTo01Range} from '@/utils/math';
 import {useDrag} from '@use-gesture/react';
 import {useId} from 'react';
-import * as Slider from '@radix-ui/react-slider';
-import * as Label from '@radix-ui/react-label';
 
 export type KnobUnit = 'time' | 'percentage';
 
@@ -40,49 +38,33 @@ export function Knob({
 		onChange(mapFrom01Range(newValue01, min, max));
 	});
 
-	/// return (
-	// 	<input
-	// 		type='range'
-	// 		value={value01}
-	// 		min={0}
-	// 		max={1}
-	// 		step={0.01}
-	// 		onChange={event => {
-	// 			const newValue01 = Number(event.target.value);
-	// 			onChange(mapFrom01Range(newValue01, min, max));
-	// 		}}
-	// 	/>
-	// );
-
 	return (
-		<Slider.Root
-			asChild
-			id={id}
-			orientation='vertical'
-			min={0}
-			max={1}
-			step={0.005}
-			value={[value01]}
-			onValueCommit={newValues01 => {
-				const [newValue01] = newValues01;
-				onChange(mapFrom01Range(newValue01, min, max));
-			}}
+		<div
+			className='flex w-16 select-none flex-col items-center text-sm outline-none focus:outline-dashed focus:outline-1 focus:outline-slate-950'
+			tabIndex={0}
 		>
-			<div autoFocus tabIndex={0} className='flex w-16 select-none flex-col items-center text-sm focus:outline-dashed focus:outline-1 focus:outline-slate-950'>
-				<Label.Root htmlFor={id}>{title}</Label.Root>
-				<div className='relative h-12 w-12 touch-none' {...bindDrag()}>
-					<div
-						className='absolute h-full w-full rounded-full bg-gray-300'
-					>
-						<div className='absolute h-full w-full' style={{rotate: `${angle}deg`}}>
-							<div className='absolute left-1/2 top-0 h-1/2 w-[2px] -translate-x-1/2 rounded-sm bg-stone-950'/>
-							<Slider.Thumb className='hidden' tabIndex={-1}/>
-						</div>
+			<label htmlFor={id}>{title}</label>
+			<div
+				id={id}
+				className='relative h-12 w-12 touch-pan-x'
+				role='slider'
+				aria-valuenow={value}
+				aria-valuemin={min}
+				aria-valuemax={max}
+				aria-valuetext={valueText}
+				aria-orientation='vertical'
+				{...bindDrag()}
+			>
+				<div
+					className='absolute h-full w-full rounded-full bg-gray-300'
+				>
+					<div className='absolute h-full w-full' style={{rotate: `${angle}deg`}}>
+						<div className='absolute left-1/2 top-0 h-1/2 w-[2px] -translate-x-1/2 rounded-sm bg-stone-950'/>
 					</div>
 				</div>
-				<Label.Root htmlFor={id}>{valueText}</Label.Root>
 			</div>
-		</Slider.Root>
+			<label htmlFor={id}>{valueText}</label>
+		</div>
 	);
 }
 
