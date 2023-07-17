@@ -1,5 +1,5 @@
 'use client';
-import {useCallback, useEffect, useRef} from 'react';
+import {useCallback, useEffect, useId, useRef, useState} from 'react';
 import WebAudioRenderer from '@elemaudio/web-renderer';
 import {el, type NodeRepr_t} from '@elemaudio/core';
 
@@ -115,7 +115,7 @@ export default function IndexPage() {
 	return (
 		<div className='px-8 py-16 md:px-12 md:py-20 lg:px-20'>
 			<div
-				className='mx-auto max-w-lg select-none border border-black p-16 text-center'
+				className='mx-auto mb-8 max-w-lg select-none border border-black p-16 text-center'
 				onTouchStart={play}
 				onTouchEnd={stop}
 				onMouseDown={play}
@@ -123,6 +123,84 @@ export default function IndexPage() {
 			>
 				Press &quot;Space&quot; key or touch here to play
 			</div>
+			<KnobInput
+				title='Attack'
+				valueDefault={AttackDefault}
+				valueMin={AttackMin}
+				valueMax={AttackMax}
+				constRef={attackRef}
+				constKey={AttackKey}
+				onChange={renderAudio}
+			/>
+			<KnobInput
+				title='Decay'
+				valueDefault={DecayDefault}
+				valueMin={DecayMin}
+				valueMax={DecayMax}
+				constRef={decayRef}
+				constKey={DecayKey}
+				onChange={renderAudio}
+			/>
+			<KnobInput
+				title='Sustain'
+				valueDefault={SustainDefault}
+				valueMin={SustainMin}
+				valueMax={SustainMax}
+				constRef={sustainRef}
+				constKey={SustainKey}
+				onChange={renderAudio}
+			/>
+			<KnobInput
+				title='Release'
+				valueDefault={ReleaseDefault}
+				valueMin={ReleaseMin}
+				valueMax={ReleaseMax}
+				constRef={releaseRef}
+				constKey={ReleaseKey}
+				onChange={renderAudio}
+			/>
+		</div>
+	);
+}
+
+type KnobInputProps = {
+	title: string;
+	valueDefault: number;
+	valueMin: number;
+	valueMax: number;
+	constRef: React.MutableRefObject<NodeRepr_t>;
+	constKey: string;
+	onChange: () => void;
+};
+function KnobInput({
+	title,
+	valueDefault,
+	valueMin,
+	valueMax,
+	constRef,
+	constKey,
+	onChange,
+}: KnobInputProps) {
+	const id = useId();
+	const [value, setValue] = useState<number>(valueDefault);
+	return (
+		<div className='flex max-w-sm flex-col'>
+			<label htmlFor={id}>{`${title} | ${value}`}</label>
+			<input
+				id={id}
+				type='range'
+				defaultValue={valueDefault}
+				min={valueMin}
+				max={valueMax}
+				step={Math.abs(valueMax - valueMin) / 1000}
+				value={value}
+				onChange={event => {
+					const value = Number(event.target.value);
+					constRef.current = el.const({key: constKey, value});
+					setValue(value);
+					onChange();
+				}}
+			/>
 		</div>
 	);
 }
