@@ -40,13 +40,13 @@ export function Knob({
 
 	return (
 		<div
-			className='group flex w-12 select-none flex-col items-center text-xs'
+			className='group flex w-16 select-none flex-col items-center text-sm'
 			tabIndex={0}
 		>
 			<label htmlFor={id}>{title}</label>
 			<div
 				id={id}
-				className='relative h-8 w-8 touch-pan-x'
+				className='relative h-12 w-12 touch-pan-x'
 				role='slider'
 				aria-valuenow={value}
 				aria-valuemin={min}
