@@ -12,6 +12,8 @@
     "@elemaudio/core": "2.0.1",
     "@elemaudio/web-renderer": "2.0.1",
     "@radix-ui/react-icons": "1.3.0",
+    "@radix-ui/react-label": "2.0.2",
+    "@radix-ui/react-slider": "1.1.2",
     "@use-gesture/react": "10.2.27",
     "clsx": "1.2.1",
     "next": "13.4.8",
