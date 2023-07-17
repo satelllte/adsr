@@ -2,6 +2,7 @@
 import {useCallback, useEffect, useId, useRef, useState} from 'react';
 import WebAudioRenderer from '@elemaudio/web-renderer';
 import {el, type NodeRepr_t} from '@elemaudio/core';
+import {Knob, type KnobProps} from '@/components/Knob';
 
 export default function IndexPage() {
 	const ctxRef = useRef<AudioContext>();
@@ -125,83 +126,86 @@ export default function IndexPage() {
 			>
 				Press &quot;Space&quot; key or touch here to play
 			</div>
-			<KnobInput
-				title='Attack'
-				valueDefault={attackDefault}
-				valueMin={attackMin}
-				valueMax={attackMax}
-				constRef={attackRef}
-				constKey={attackKey}
-				onChange={renderAudio}
-			/>
-			<KnobInput
-				title='Decay'
-				valueDefault={decayDefault}
-				valueMin={decayMin}
-				valueMax={decayMax}
-				constRef={decayRef}
-				constKey={decayKey}
-				onChange={renderAudio}
-			/>
-			<KnobInput
-				title='Sustain'
-				valueDefault={sustainDefault}
-				valueMin={sustainMin}
-				valueMax={sustainMax}
-				constRef={sustainRef}
-				constKey={sustainKey}
-				onChange={renderAudio}
-			/>
-			<KnobInput
-				title='Release'
-				valueDefault={releaseDefault}
-				valueMin={releaseMin}
-				valueMax={releaseMax}
-				constRef={releaseRef}
-				constKey={releaseKey}
-				onChange={renderAudio}
-			/>
+			<div className='flex gap-4'>
+				<KnobInput
+					title='Attack'
+					unit='time'
+					min={attackMin}
+					max={attackMax}
+					defaultValue={attackDefault}
+					constRef={attackRef}
+					constKey={attackKey}
+					onChange={renderAudio}
+				/>
+				<KnobInput
+					title='Decay'
+					unit='time'
+					min={decayMin}
+					max={decayMax}
+					defaultValue={decayDefault}
+					constRef={decayRef}
+					constKey={decayKey}
+					onChange={renderAudio}
+				/>
+				<KnobInput
+					title='Sustain'
+					unit='percentage'
+					min={sustainMin}
+					max={sustainMax}
+					defaultValue={sustainDefault}
+					constRef={sustainRef}
+					constKey={sustainKey}
+					onChange={renderAudio}
+				/>
+				<KnobInput
+					title='Release'
+					unit='time'
+					min={releaseMin}
+					max={releaseMax}
+					defaultValue={releaseDefault}
+					constRef={releaseRef}
+					constKey={releaseKey}
+					onChange={renderAudio}
+				/>
+			</div>
 		</div>
 	);
 }
 
-type KnobInputProps = {
-	title: string;
-	valueDefault: number;
-	valueMin: number;
-	valueMax: number;
+type KnobInputProps = Pick<KnobProps,
+| 'title'
+| 'unit'
+| 'min'
+| 'max'
+> & {
+	defaultValue: number;
 	constRef: React.MutableRefObject<NodeRepr_t>;
 	constKey: string;
 	onChange: () => void;
 };
 function KnobInput({
 	title,
-	valueDefault,
-	valueMin,
-	valueMax,
+	unit,
+	min,
+	max,
+	defaultValue,
 	constRef,
 	constKey,
 	onChange,
 }: KnobInputProps) {
-	const id = useId();
-	const [value, setValue] = useState<number>(valueDefault);
+	const [value, setValue] = useState<number>(defaultValue);
 	return (
-		<div className='flex max-w-sm select-none flex-col'>
-			<label htmlFor={id}>{`${title} | ${value}`}</label>
-			<input
-				id={id}
-				type='range'
-				min={valueMin}
-				max={valueMax}
-				step={Math.abs(valueMax - valueMin) / 1000}
-				value={value}
-				onChange={event => {
-					const value = Number(event.target.value);
-					constRef.current = el.const({key: constKey, value});
-					setValue(value);
-					onChange();
-				}}
-			/>
-		</div>
+		<Knob
+			title={title}
+			unit={unit}
+			value={value}
+			min={min}
+			max={max}
+			onChange={newValue => {
+				constRef.current = el.const({key: constKey, value: newValue});
+				setValue(newValue);
+				onChange();
+			}}
+		/>
 	);
 }
