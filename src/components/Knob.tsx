@@ -27,12 +27,11 @@ export function Knob({
 	const id = useId();
 
 	const value01 = mapTo01Range(value, min, max);
+	const valueText = `${renderValue(value, unit)} ${renderUnit(unit)}`;
 
 	const angleMin = -145; // The minumum knob position angle, when x = 0
 	const angleMax = 145; // The maximum knob position angle, when x = 1
 	const angle = mapFrom01Range(value01, angleMin, angleMax);
-
-	const valueText = `${renderValue(value, unit)} ${renderUnit(unit)}`;
 
 	const changeValueBy = (diff01: number): void => {
 		const newValue01 = clamp01(value01 + diff01);
