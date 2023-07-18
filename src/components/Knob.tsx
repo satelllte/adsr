@@ -44,8 +44,6 @@ export function Knob({
 	};
 
 	const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = ({code}) => {
-		console.debug(`onKeyDown | ${title} | event.code: `, code);
-
 		if (code === 'ArrowLeft' || code === 'ArrowDown') {
 			changeValueBy(-0.01);
 			return;
