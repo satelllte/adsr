@@ -199,6 +199,7 @@ function KnobInput({
 			title={title}
 			unit={unit}
 			value={value}
+			defaultValue={defaultValue}
 			min={min}
 			max={max}
 			onChange={newValue => {

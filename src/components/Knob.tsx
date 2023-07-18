@@ -9,6 +9,7 @@ export type KnobProps = {
 	title: string;
 	unit: KnobUnit;
 	value: number;
+	defaultValue: number;
 	min: number;
 	max: number;
 	onChange: (newValue: number) => void;
@@ -18,6 +19,7 @@ export function Knob({
 	title,
 	unit,
 	value,
+	defaultValue,
 	min,
 	max,
 	onChange,
@@ -32,16 +34,44 @@ export function Knob({
 
 	const valueText = `${renderValue(value, unit)} ${renderUnit(unit)}`;
 
-	const bindDrag = useDrag(({delta}) => {
-		const diff = delta[1] * (-0.006); // Multiplying by negative sensitivity. Vertical axis (Y) direction of the screen is inverted.
-		const newValue01 = clamp01(value01 + diff);
+	const changeValueBy = (diff01: number): void => {
+		const newValue01 = clamp01(value01 + diff01);
 		onChange(mapFrom01Range(newValue01, min, max));
+	};
+
+	const changeValueTo = (newValue01: number): void => {
+		onChange(mapFrom01Range(newValue01, min, max));
+	};
+
+	const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = ({code}) => {
+		console.debug(`onKeyDown | ${title} | event.code: `, code);
+
+		if (code === 'ArrowLeft' || code === 'ArrowDown') {
+			changeValueBy(-0.01);
+			return;
+		}
+
+		if (code === 'ArrowRight' || code === 'ArrowUp') {
+			changeValueBy(0.01);
+			return;
+		}
+
+		if (code === 'Backspace' || code === 'Delete') {
+			const defaultValue01 = mapTo01Range(defaultValue, min, max);
+			changeValueTo(defaultValue01);
+		}
+	};
+
+	const bindDrag = useDrag(({delta}) => {
+		const diff01 = delta[1] * (-0.006); // Multiplying by negative sensitivity. Vertical axis (Y) direction of the screen is inverted.
+		changeValueBy(diff01);
 	});
 
 	return (
 		<div
 			className='flex w-16 select-none flex-col items-center text-sm outline-none focus:outline-dashed focus:outline-1 focus:outline-slate-950'
 			tabIndex={0} // Making element focusable and be accessible with Tab key. Details: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex
+			onKeyDown={onKeyDown}
 			onPointerDown={event => {
 				// Touch devices have a delay before focusing so it won't focus if touch immediately moves away from target (sliding). We want thumb to focus regardless.
 				// See, for reference, Radix UI Slider does the same: https://github.com/radix-ui/primitives/blob/eca6babd188df465f64f23f3584738b85dba610e/packages/react/slider/src/Slider.tsx#L442-L445
