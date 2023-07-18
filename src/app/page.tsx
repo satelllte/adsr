@@ -33,12 +33,12 @@ export default function IndexPage() {
 
 	const attackKey = 'attack';
 	const attackMin = 0.0001;
-	const attackMax = 60;
+	const attackMax = 10;
 	const attackDefault = 0.001;
 
 	const decayKey = 'decay';
 	const decayMin = 0.0001;
-	const decayMax = 60;
+	const decayMax = 10;
 	const decayDefault = 0.6;
 
 	const sustainKey = 'sustain';
@@ -48,7 +48,7 @@ export default function IndexPage() {
 
 	const releaseKey = 'release';
 	const releaseMin = 0.0001;
-	const releaseMax = 60;
+	const releaseMax = 10;
 	const releaseDefault = 0.6;
 
 	const gateRef = useRef<NodeRepr_t>(el.const({key: gateKey, value: gateDefault}));
