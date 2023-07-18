@@ -126,7 +126,7 @@ export default function IndexPage() {
 			>
 				Press &quot;Space&quot; key or touch here to play
 			</div>
-			<div className='flex gap-4'>
+			<div className='flex justify-center gap-3'>
 				<KnobInput
 					title='Attack'
 					unit='time'
