@@ -30,7 +30,7 @@ export function Knob({
 	const angleMax = 145; // The maximum knob position angle, when x = 1
 	const angle = mapFrom01Range(value01, angleMin, angleMax);
 
-	const valueText = `${parseFloat(`${value}`).toFixed(2)} ${renderUnit(unit)}`;
+	const valueText = `${renderValue(value, unit)} ${renderUnit(unit)}`;
 
 	const bindDrag = useDrag(({delta}) => {
 		const diff = delta[1] * (-0.006); // Multiplying by negative sensitivity. Vertical axis (Y) direction of the screen is inverted.
@@ -72,6 +72,14 @@ export function Knob({
 		</div>
 	);
 }
+
+const renderValue = (value: number, unit: KnobUnit): string => {
+	if (unit === 'percentage') {
+		return parseFloat(`${value * 100}`).toFixed(0);
+	}
+
+	return parseFloat(`${value}`).toFixed(2);
+};
 
 const renderUnit = (unit: KnobUnit): string => {
 	switch (unit) {
