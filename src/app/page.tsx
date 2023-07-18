@@ -3,6 +3,7 @@ import {useCallback, useEffect, useId, useRef, useState} from 'react';
 import WebAudioRenderer from '@elemaudio/web-renderer';
 import {el, type NodeRepr_t} from '@elemaudio/core';
 import {Knob, type KnobProps} from '@/components/Knob';
+import {keyCodes} from '@/constants/key-codes';
 
 export default function IndexPage() {
 	const ctxRef = useRef<AudioContext>();
@@ -95,13 +96,13 @@ export default function IndexPage() {
 				return;
 			}
 
-			if (event.code === 'Space') {
+			if (event.code === keyCodes.space) {
 				play();
 			}
 		};
 
 		const onKeyUp = (event: KeyboardEvent) => {
-			if (event.code === 'Space') {
+			if (event.code === keyCodes.space) {
 				stop();
 			}
 		};

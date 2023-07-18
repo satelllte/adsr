@@ -1,4 +1,5 @@
 'use client';
+import {keyCodes} from '@/constants/key-codes';
 import {clamp01, mapFrom01Range, mapTo01Range} from '@/utils/math';
 import {useDrag} from '@use-gesture/react';
 import {useId} from 'react';
@@ -43,17 +44,17 @@ export function Knob({
 	};
 
 	const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = ({code}) => {
-		if (code === 'ArrowLeft' || code === 'ArrowDown') {
+		if (code === keyCodes.arrowLeft || code === keyCodes.arrowDown) {
 			changeValueBy(-0.01);
 			return;
 		}
 
-		if (code === 'ArrowRight' || code === 'ArrowUp') {
+		if (code === keyCodes.arrowRight || code === keyCodes.arrowUp) {
 			changeValueBy(0.01);
 			return;
 		}
 
-		if (code === 'Backspace' || code === 'Delete') {
+		if (code === keyCodes.backspace || code === keyCodes.delete) {
 			const defaultValue01 = mapTo01Range(defaultValue, min, max);
 			changeValueTo(defaultValue01);
 		}
