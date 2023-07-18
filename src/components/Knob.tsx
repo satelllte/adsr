@@ -41,7 +41,7 @@ export function Knob({
 	return (
 		<div
 			className='flex w-16 select-none flex-col items-center text-sm outline-none focus:outline-dashed focus:outline-1 focus:outline-slate-950'
-			tabIndex={0}
+			tabIndex={0} // Making element focusable and be accessible with Tab key. Details: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex
 			onPointerDown={event => {
 				// Touch devices have a delay before focusing so won't focus if touch immediately moves away from target (sliding). We want thumb to focus regardless.
 				// See, for reference, Radix UI Slider does the same: https://github.com/radix-ui/primitives/blob/eca6babd188df465f64f23f3584738b85dba610e/packages/react/slider/src/Slider.tsx#L442-L445
@@ -51,7 +51,7 @@ export function Knob({
 			<label htmlFor={id}>{title}</label>
 			<div
 				id={id}
-				className='relative h-12 w-12 touch-none'
+				className='relative h-12 w-12 touch-none' // It's recommended to disable "touch-action" for use-gesture: https://use-gesture.netlify.app/docs/extras/#touch-action
 				role='slider'
 				aria-valuenow={value}
 				aria-valuemin={min}
