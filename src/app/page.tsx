@@ -1,5 +1,5 @@
 'use client';
-import {useCallback, useEffect, useId, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import WebAudioRenderer from '@elemaudio/web-renderer';
 import {el, type NodeRepr_t} from '@elemaudio/core';
 import {Knob, type KnobProps} from '@/components/Knob';
