@@ -6,4 +6,16 @@ export const keyCodes = {
 	backspace: 'Backspace',
 	delete: 'Delete',
 	space: 'Space',
-} satisfies Record<string, string>;
+	keyA: 'KeyA',
+	keyD: 'KeyD',
+	keyE: 'KeyE',
+	keyF: 'KeyF',
+	keyG: 'KeyG',
+	keyH: 'KeyH',
+	keyJ: 'KeyJ',
+	keyS: 'KeyS',
+	keyT: 'KeyT',
+	keyU: 'KeyU',
+	keyW: 'KeyW',
+	keyY: 'KeyY',
+} as const;

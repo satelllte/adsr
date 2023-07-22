@@ -5,6 +5,7 @@ import {el, type NodeRepr_t} from '@elemaudio/core';
 import {Knob, type KnobProps} from '@/components/Knob';
 import {Piano} from '@/components/Piano';
 import {keyCodes} from '@/constants/key-codes';
+import {getMidiIndex, mapMidiToHz} from '@/utils/math';
 
 export default function IndexPage() {
 	const ctxRef = useRef<AudioContext>();
@@ -53,11 +54,15 @@ export default function IndexPage() {
 	const releaseMax = 10;
 	const releaseDefault = 0.6;
 
+	const freqKey = 'freq';
+	const freqDefault = 440;
+
 	const gateRef = useRef<NodeRepr_t>(el.const({key: gateKey, value: gateDefault}));
 	const attackRef = useRef<NodeRepr_t>(el.const({key: attackKey, value: attackDefault}));
 	const decayRef = useRef<NodeRepr_t>(el.const({key: decayKey, value: decayDefault}));
 	const sustainRef = useRef<NodeRepr_t>(el.const({key: sustainKey, value: sustainDefault}));
 	const releaseRef = useRef<NodeRepr_t>(el.const({key: releaseKey, value: releaseDefault}));
+	const freqRef = useRef<NodeRepr_t>(el.const({key: freqKey, value: freqDefault}));
 
 	const renderAudio = async () => {
 		const ctx = ctxRef.current;
@@ -75,8 +80,9 @@ export default function IndexPage() {
 		const sustain = sustainRef.current;
 		const release = releaseRef.current;
 		const gate = gateRef.current;
+		const freq = freqRef.current;
 		const envelope = el.adsr(attack, decay, sustain, release, gate);
-		const sine = el.cycle(220);
+		const sine = el.cycle(freq);
 		const out = el.mul(envelope, sine);
 		core.render(out, out);
 	};
@@ -97,13 +103,83 @@ export default function IndexPage() {
 				return;
 			}
 
-			if (event.code === keyCodes.space) {
+			const octave = 4; // Sticking to hardcoded octave for now ...
+
+			let midiKey: number | undefined;
+
+			if (event.code === keyCodes.keyA) {
+				midiKey = getMidiIndex(0, octave); // C
+			}
+
+			if (event.code === keyCodes.keyW) {
+				midiKey = getMidiIndex(1, octave); // C#
+			}
+
+			if (event.code === keyCodes.keyS) {
+				midiKey = getMidiIndex(2, octave); // D
+			}
+
+			if (event.code === keyCodes.keyE) {
+				midiKey = getMidiIndex(3, octave); // D#
+			}
+
+			if (event.code === keyCodes.keyD) {
+				midiKey = getMidiIndex(4, octave); // E
+			}
+
+			if (event.code === keyCodes.keyF) {
+				midiKey = getMidiIndex(5, octave); // F
+			}
+
+			if (event.code === keyCodes.keyT) {
+				midiKey = getMidiIndex(6, octave); // F#
+			}
+
+			if (event.code === keyCodes.keyG) {
+				midiKey = getMidiIndex(7, octave); // G
+			}
+
+			if (event.code === keyCodes.keyY) {
+				midiKey = getMidiIndex(8, octave); // G#
+			}
+
+			if (event.code === keyCodes.keyH) {
+				midiKey = getMidiIndex(9, octave); // A
+			}
+
+			if (event.code === keyCodes.keyU) {
+				midiKey = getMidiIndex(10, octave); // A#
+			}
+
+			if (event.code === keyCodes.keyJ) {
+				midiKey = getMidiIndex(11, octave); // B
+			}
+
+			if (midiKey) {
+				console.debug('midiKey: ', midiKey);
+				const freq = mapMidiToHz(midiKey);
+				freqRef.current = el.const({key: freqKey, value: freq});
 				play();
 			}
 		};
 
 		const onKeyUp = (event: KeyboardEvent) => {
-			if (event.code === keyCodes.space) {
+			if (
+				event.code === keyCodes.keyA // C
+				|| event.code === keyCodes.keyW // C#
+				|| event.code === keyCodes.keyS // D
+				|| event.code === keyCodes.keyE // D#
+				|| event.code === keyCodes.keyD // E
+				|| event.code === keyCodes.keyF // F
+				|| event.code === keyCodes.keyT // F#
+				|| event.code === keyCodes.keyG // G
+				|| event.code === keyCodes.keyY // G#
+				|| event.code === keyCodes.keyH // A
+				|| event.code === keyCodes.keyU // A#
+				|| event.code === keyCodes.keyJ // B
+			) {
+				// eslint-disable-next-line no-warning-comments
+				// TODO: create a queue of pressed notes and stop only after it became empty
 				stop();
 			}
 		};
