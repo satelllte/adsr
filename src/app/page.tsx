@@ -156,7 +156,6 @@ export default function IndexPage() {
 			}
 
 			if (midiKey) {
-				console.debug('midiKey: ', midiKey);
 				const freq = mapMidiToHz(midiKey);
 				freqRef.current = el.const({key: freqKey, value: freq});
 				play();
