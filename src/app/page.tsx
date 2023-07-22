@@ -202,7 +202,7 @@ export default function IndexPage() {
 				onMouseDown={play}
 				onMouseUp={stop}
 			>
-				Press &quot;Space&quot; key or touch here to play
+				Touch here to play
 			</div>
 			<div className='flex justify-center gap-3'>
 				<KnobInput
