@@ -3,6 +3,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import WebAudioRenderer from '@elemaudio/web-renderer';
 import {el, type NodeRepr_t} from '@elemaudio/core';
 import {Knob, type KnobProps} from '@/components/Knob';
+import {Piano} from '@/components/Piano';
 import {keyCodes} from '@/constants/key-codes';
 
 export default function IndexPage() {
@@ -168,6 +169,9 @@ export default function IndexPage() {
 					constKey={releaseKey}
 					onChange={renderAudio}
 				/>
+			</div>
+			<div className='py-8'>
+				<Piano/>
 			</div>
 		</div>
 	);
