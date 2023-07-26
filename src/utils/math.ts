@@ -20,17 +20,3 @@ export const mapFrom01Range = (x: number, min: number, max: number): number =>
  */
 export const mapTo01Range = (x: number, min: number, max: number): number =>
   (x - min) / (max - min);
-
-/**
- * Maps MIDI index to frequency in Hz. A4 MIDI note's index is 69
- */
-export const mapMidiToHz = (midiIndex: number): number =>
-  440 * 2 ** ((midiIndex - 69) / 12);
-
-/**
- * Gets MIDI note index by (note, octave) pair.
- * "note" - number from 0 to 11, defining a note from "C" to "B" (absolute, without specifying octave).
- * "octave" - number of octave from 1 to 9.
- */
-export const getMidiIndex = (note: number, octave: number): number =>
-  12 + 12 * octave + note;
