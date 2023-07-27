@@ -5,6 +5,7 @@ export default {
   content: ['./src/**/*.{ts,tsx}'],
   theme: {
     colors: {
+      'gray-0': '#111111',
       'gray-1': '#202020',
       'gray-2': '#2a2a2a',
       'gray-3': '#353535',

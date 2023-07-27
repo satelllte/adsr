@@ -137,9 +137,26 @@ export function SynthPage() {
   }, [play, stop]);
 
   return (
-    <Centered>
-      <div className='flex flex-col gap-8 px-2 py-6'>
-        <div className='flex flex-wrap justify-center gap-3'>
+    <Centered
+      bottomArea={
+        <div className='p-4 md:p-8'>
+          <InteractionArea
+            icon={<PlayIcon />}
+            title={"Touch here to play or press the 'Space' key."}
+            onTouchStart={play}
+            onTouchEnd={stop}
+            onMouseDown={play}
+            onMouseUp={stop}
+          />
+        </div>
+      }
+    >
+      <div className='mx-4 bg-gray-2'>
+        <div className='flex select-none items-center gap-2 bg-gray-1 px-2 py-1 text-sm'>
+          <div className='h-2 w-2 rounded-full bg-green' />
+          Simple Synth
+        </div>
+        <div className='flex flex-wrap justify-center gap-3 p-4'>
           <KnobInput
             title='Attack'
             unit='time'
@@ -181,14 +198,6 @@ export function SynthPage() {
             onChange={renderAudio}
           />
         </div>
-        <InteractionArea
-          icon={<PlayIcon />}
-          title={"Touch here to play or press the 'Space' key."}
-          onTouchStart={play}
-          onTouchEnd={stop}
-          onMouseDown={play}
-          onMouseUp={stop}
-        />
       </div>
     </Centered>
   );
