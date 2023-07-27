@@ -143,7 +143,7 @@ function SynthPageMain({ctxRef, coreRef}: SynthPageMainProps) {
   }, [renderAudio]);
 
   useEffect(() => {
-    const onKeyDown = async (event: KeyboardEvent) => {
+    const onKeyDown = (event: KeyboardEvent) => {
       if (event.repeat) {
         return;
       }
