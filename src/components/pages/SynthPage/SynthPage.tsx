@@ -109,7 +109,7 @@ function SynthPageMain({ctxRef, coreRef}: SynthPageMainProps) {
     el.const({key: freqKey, value: freqDefault}),
   );
 
-  const renderAudio = async () => {
+  const renderAudio = useCallback(async () => {
     const ctx = ctxRef.current;
     const core = coreRef.current;
     if (!ctx || !core) {
@@ -130,17 +130,17 @@ function SynthPageMain({ctxRef, coreRef}: SynthPageMainProps) {
     const sine = el.cycle(freq);
     const out = el.mul(envelope, sine);
     core.render(out, out);
-  };
+  }, [coreRef, ctxRef]);
 
   const play = useCallback(() => {
     gateRef.current = el.const({key: gateKey, value: gateOn});
     void renderAudio();
-  }, []);
+  }, [renderAudio]);
 
   const stop = useCallback(() => {
     gateRef.current = el.const({key: gateKey, value: gateOff});
     void renderAudio();
-  }, []);
+  }, [renderAudio]);
 
   useEffect(() => {
     const onKeyDown = async (event: KeyboardEvent) => {
@@ -186,7 +186,7 @@ function SynthPageMain({ctxRef, coreRef}: SynthPageMainProps) {
       }
     >
       <PageElementContainer>
-        <SynthContainer title={title}>
+        <SynthContainer isActivated title={title}>
           <KnobsContainer>
             <KnobInput
               title='Attack'
