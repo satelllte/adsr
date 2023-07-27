@@ -13,6 +13,8 @@ export type KnobProps = {
   min: number;
   max: number;
   onChange: (newValue: number) => void;
+  mapTo01?: (x: number, min: number, max: number) => number;
+  mapFrom01?: (x: number, min: number, max: number) => number;
 };
 
 export function Knob({
@@ -23,23 +25,25 @@ export function Knob({
   min,
   max,
   onChange,
+  mapTo01 = mapTo01Linear,
+  mapFrom01 = mapFrom01Linear,
 }: KnobProps) {
   const id = useId();
 
-  const value01 = mapTo01Linear(value, min, max);
+  const value01 = mapTo01(value, min, max);
   const valueText = `${renderValue(value, unit)} ${renderUnit(unit)}`;
 
   const angleMin = -145; // The minumum knob position angle, when x = 0
   const angleMax = 145; // The maximum knob position angle, when x = 1
-  const angle = mapFrom01Linear(value01, angleMin, angleMax);
+  const angle = mapFrom01(value01, angleMin, angleMax);
 
   const changeValueBy = (diff01: number): void => {
     const newValue01 = clamp01(value01 + diff01);
-    onChange(mapFrom01Linear(newValue01, min, max));
+    onChange(mapFrom01(newValue01, min, max));
   };
 
   const changeValueTo = (newValue01: number): void => {
-    onChange(mapFrom01Linear(newValue01, min, max));
+    onChange(mapFrom01(newValue01, min, max));
   };
 
   const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = ({code}) => {
@@ -54,7 +58,7 @@ export function Knob({
     }
 
     if (code === keyCodes.backspace || code === keyCodes.delete) {
-      const defaultValue01 = mapTo01Linear(defaultValue, min, max);
+      const defaultValue01 = mapTo01(defaultValue, min, max);
       changeValueTo(defaultValue01);
     }
   };
