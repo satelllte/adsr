@@ -5,6 +5,8 @@ import {el, type NodeRepr_t} from '@elemaudio/core';
 import {Knob, type KnobProps} from '@/components/ui/Knob';
 import {keyCodes} from '@/constants/key-codes';
 import {Centered} from '@/components/layout/Centered';
+import {InteractionArea} from '../ui/InteractionArea';
+import {PlayIcon} from '@/components/icons/PlayIcon';
 
 export function SynthPage() {
   const ctxRef = useRef<AudioContext>();
@@ -136,17 +138,8 @@ export function SynthPage() {
 
   return (
     <Centered>
-      <div className='px-2 py-6'>
-        <div
-          className='mx-auto mb-8 select-none border border-black p-4 text-center sm:p-8 md:p-16'
-          onTouchStart={play}
-          onTouchEnd={stop}
-          onMouseDown={play}
-          onMouseUp={stop}
-        >
-          Touch here to play or press &quot;Space&quot; key
-        </div>
-        <div className='flex justify-center gap-3'>
+      <div className='flex flex-col gap-8 px-2 py-6'>
+        <div className='flex flex-wrap justify-center gap-3'>
           <KnobInput
             title='Attack'
             unit='time'
@@ -188,6 +181,14 @@ export function SynthPage() {
             onChange={renderAudio}
           />
         </div>
+        <InteractionArea
+          icon={<PlayIcon />}
+          title={"Touch here to play or press the 'Space' key."}
+          onTouchStart={play}
+          onTouchEnd={stop}
+          onMouseDown={play}
+          onMouseUp={stop}
+        />
       </div>
     </Centered>
   );

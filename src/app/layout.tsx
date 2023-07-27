@@ -27,10 +27,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang='en'>
       <body
-        className={clsx(
-          font.className,
-          'bg-brand-gray-1 text-brand-gray-7 selection:bg-blue-500 selection:text-white',
-        )}
+        className={clsx(font.className, 'bg-brand-gray-1 text-brand-gray-7')}
       >
         {children}
       </body>
