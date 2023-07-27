@@ -1,0 +1,1 @@
+export {SynthPage} from './SynthPage';

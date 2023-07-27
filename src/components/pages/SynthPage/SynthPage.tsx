@@ -5,8 +5,10 @@ import {el, type NodeRepr_t} from '@elemaudio/core';
 import {Knob, type KnobProps} from '@/components/ui/Knob';
 import {keyCodes} from '@/constants/key-codes';
 import {Centered} from '@/components/layout/Centered';
-import {InteractionArea} from '../ui/InteractionArea';
+import {InteractionArea} from '@/components/ui/InteractionArea';
 import {PlayIcon} from '@/components/icons/PlayIcon';
+import {SynthContainer} from './SynthContainer';
+import {PageElementContainer} from './PageElementContainer';
 
 export function SynthPage() {
   const ctxRef = useRef<AudioContext>();
@@ -139,66 +141,66 @@ export function SynthPage() {
   return (
     <Centered
       bottomArea={
-        <div className='p-4 md:p-8'>
-          <InteractionArea
-            icon={<PlayIcon />}
-            title={"Touch here to play or press the 'Space' key."}
-            onTouchStart={play}
-            onTouchEnd={stop}
-            onMouseDown={play}
-            onMouseUp={stop}
-          />
-        </div>
+        <PageElementContainer>
+          <div className='py-4'>
+            <InteractionArea
+              icon={<PlayIcon />}
+              title={"Touch here to play or press the 'Space' key."}
+              onTouchStart={play}
+              onTouchEnd={stop}
+              onMouseDown={play}
+              onMouseUp={stop}
+            />
+          </div>
+        </PageElementContainer>
       }
     >
-      <div className='mx-4 bg-gray-2'>
-        <div className='flex select-none items-center gap-2 bg-gray-1 px-2 py-1 text-sm'>
-          <div className='h-2 w-2 rounded-full bg-green' />
-          Simple Synth
-        </div>
-        <div className='flex flex-wrap justify-center gap-3 p-4'>
-          <KnobInput
-            title='Attack'
-            unit='time'
-            min={attackMin}
-            max={attackMax}
-            defaultValue={attackDefault}
-            constRef={attackRef}
-            constKey={attackKey}
-            onChange={renderAudio}
-          />
-          <KnobInput
-            title='Decay'
-            unit='time'
-            min={decayMin}
-            max={decayMax}
-            defaultValue={decayDefault}
-            constRef={decayRef}
-            constKey={decayKey}
-            onChange={renderAudio}
-          />
-          <KnobInput
-            title='Sustain'
-            unit='percentage'
-            min={sustainMin}
-            max={sustainMax}
-            defaultValue={sustainDefault}
-            constRef={sustainRef}
-            constKey={sustainKey}
-            onChange={renderAudio}
-          />
-          <KnobInput
-            title='Release'
-            unit='time'
-            min={releaseMin}
-            max={releaseMax}
-            defaultValue={releaseDefault}
-            constRef={releaseRef}
-            constKey={releaseKey}
-            onChange={renderAudio}
-          />
-        </div>
-      </div>
+      <PageElementContainer>
+        <SynthContainer title='Simple Synth'>
+          <div className='flex flex-wrap justify-center gap-3'>
+            <KnobInput
+              title='Attack'
+              unit='time'
+              min={attackMin}
+              max={attackMax}
+              defaultValue={attackDefault}
+              constRef={attackRef}
+              constKey={attackKey}
+              onChange={renderAudio}
+            />
+            <KnobInput
+              title='Decay'
+              unit='time'
+              min={decayMin}
+              max={decayMax}
+              defaultValue={decayDefault}
+              constRef={decayRef}
+              constKey={decayKey}
+              onChange={renderAudio}
+            />
+            <KnobInput
+              title='Sustain'
+              unit='percentage'
+              min={sustainMin}
+              max={sustainMax}
+              defaultValue={sustainDefault}
+              constRef={sustainRef}
+              constKey={sustainKey}
+              onChange={renderAudio}
+            />
+            <KnobInput
+              title='Release'
+              unit='time'
+              min={releaseMin}
+              max={releaseMax}
+              defaultValue={releaseDefault}
+              constRef={releaseRef}
+              constKey={releaseKey}
+              onChange={renderAudio}
+            />
+          </div>
+        </SynthContainer>
+      </PageElementContainer>
     </Centered>
   );
 }
