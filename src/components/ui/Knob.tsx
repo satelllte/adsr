@@ -1,6 +1,5 @@
-'use client';
 import {keyCodes} from '@/constants/key-codes';
-import {clamp01, mapFrom01Range, mapTo01Range} from '@/utils/math';
+import {clamp01, mapFrom01Linear, mapTo01Linear} from '@/utils/math';
 import {useDrag} from '@use-gesture/react';
 import {useId} from 'react';
 
@@ -27,20 +26,20 @@ export function Knob({
 }: KnobProps) {
   const id = useId();
 
-  const value01 = mapTo01Range(value, min, max);
+  const value01 = mapTo01Linear(value, min, max);
   const valueText = `${renderValue(value, unit)} ${renderUnit(unit)}`;
 
   const angleMin = -145; // The minumum knob position angle, when x = 0
   const angleMax = 145; // The maximum knob position angle, when x = 1
-  const angle = mapFrom01Range(value01, angleMin, angleMax);
+  const angle = mapFrom01Linear(value01, angleMin, angleMax);
 
   const changeValueBy = (diff01: number): void => {
     const newValue01 = clamp01(value01 + diff01);
-    onChange(mapFrom01Range(newValue01, min, max));
+    onChange(mapFrom01Linear(newValue01, min, max));
   };
 
   const changeValueTo = (newValue01: number): void => {
-    onChange(mapFrom01Range(newValue01, min, max));
+    onChange(mapFrom01Linear(newValue01, min, max));
   };
 
   const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = ({code}) => {
@@ -55,7 +54,7 @@ export function Knob({
     }
 
     if (code === keyCodes.backspace || code === keyCodes.delete) {
-      const defaultValue01 = mapTo01Range(defaultValue, min, max);
+      const defaultValue01 = mapTo01Linear(defaultValue, min, max);
       changeValueTo(defaultValue01);
     }
   };
