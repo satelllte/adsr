@@ -20,7 +20,7 @@ export default function IndexPage() {
       <Centered>
         <button
           type='button'
-          className='bg-brand-gray-2 px-8 py-2 outline-none webkit-tap-transparent hover:bg-brand-gray-3 focus-visible:outline-1 focus-visible:outline-brand-gray-5 active:bg-brand-gray-4 md:px-10 lg:px-12 lg:py-3'
+          className='bg-gray-2 px-8 py-2 outline-none webkit-tap-transparent hover:bg-gray-3 focus-visible:outline-1 focus-visible:outline-gray-5 active:bg-gray-4 md:px-10 lg:px-12 lg:py-3'
           onClick={launch}
         >
           <PlayIcon />

@@ -67,7 +67,7 @@ export function Knob({
 
   return (
     <div
-      className='flex w-16 select-none flex-col items-center text-sm outline-none focus:outline-dashed focus:outline-1 focus:outline-brand-gray-4'
+      className='flex w-16 select-none flex-col items-center text-sm outline-none focus:outline-dashed focus:outline-1 focus:outline-gray-4'
       tabIndex={0} // Making element focusable and be accessible with Tab key. Details: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex
       onKeyDown={onKeyDown}
       onPointerDown={(event) => {
@@ -88,12 +88,12 @@ export function Knob({
         aria-orientation='vertical'
         {...bindDrag()}
       >
-        <div className='absolute h-full w-full rounded-full bg-brand-gray-3'>
+        <div className='absolute h-full w-full rounded-full bg-gray-3'>
           <div
             className='absolute h-full w-full'
             style={{rotate: `${angle}deg`}}
           >
-            <div className='absolute left-1/2 top-0 h-1/2 w-[2px] -translate-x-1/2 rounded-sm bg-brand-gray-7' />
+            <div className='absolute left-1/2 top-0 h-1/2 w-[2px] -translate-x-1/2 rounded-sm bg-gray-7' />
           </div>
         </div>
       </div>
