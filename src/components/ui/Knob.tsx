@@ -3,39 +3,37 @@ import {clamp01, mapFrom01Linear, mapTo01Linear} from '@/utils/math';
 import {useDrag} from '@use-gesture/react';
 import {useId} from 'react';
 
-export type KnobUnit = 'time' | 'percentage';
-
 export type KnobProps = {
   title: string;
-  unit: KnobUnit;
   value: number;
   defaultValue: number;
   min: number;
   max: number;
   onChange: (newValue: number) => void;
+  displayValueFn: (value: number) => string;
   mapTo01?: (x: number, min: number, max: number) => number;
   mapFrom01?: (x: number, min: number, max: number) => number;
 };
 
 export function Knob({
   title,
-  unit,
   value,
   defaultValue,
   min,
   max,
   onChange,
+  displayValueFn,
   mapTo01 = mapTo01Linear,
   mapFrom01 = mapFrom01Linear,
 }: KnobProps) {
   const id = useId();
 
   const value01 = mapTo01(value, min, max);
-  const valueText = `${renderValue(value, unit)} ${renderUnit(unit)}`;
+  const valueText = displayValueFn(value);
 
   const angleMin = -145; // The minumum knob position angle, when x = 0
   const angleMax = 145; // The maximum knob position angle, when x = 1
-  const angle = mapFrom01(value01, angleMin, angleMax);
+  const angle = mapFrom01Linear(value01, angleMin, angleMax);
 
   const changeValueBy = (diff01: number): void => {
     const newValue01 = clamp01(value01 + diff01);
@@ -104,22 +102,3 @@ export function Knob({
     </div>
   );
 }
-
-const renderValue = (value: number, unit: KnobUnit): string => {
-  if (unit === 'percentage') {
-    return parseFloat(`${value * 100}`).toFixed(0);
-  }
-
-  return parseFloat(`${value}`).toFixed(2);
-};
-
-const renderUnit = (unit: KnobUnit): string => {
-  switch (unit) {
-    case 'time':
-      return 's';
-    case 'percentage':
-      return '%';
-    default:
-      return unit;
-  }
-};

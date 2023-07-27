@@ -2,8 +2,9 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import WebAudioRenderer from '@elemaudio/web-renderer';
 import {el, type NodeRepr_t} from '@elemaudio/core';
-import {Knob, type KnobProps} from '@/components/ui/Knob';
 import {keyCodes} from '@/constants/key-codes';
+import {KnobPercentage} from '@/components/ui/KnobPercentage';
+import {KnobAdr} from '@/components/ui/KnobAdr';
 import {Centered} from '@/components/layout/Centered';
 import {InteractionArea} from '@/components/ui/InteractionArea';
 import {PlayIcon} from '@/components/icons/PlayIcon';
@@ -62,29 +63,21 @@ type SynthPageMainProps = {
 };
 
 function SynthPageMain({ctxRef, coreRef}: SynthPageMainProps) {
-  const gateKey = 'gate';
   const gateOff = 0;
   const gateOn = 1;
+  const gateKey = 'gate';
   const gateDefault = gateOff;
 
   const attackKey = 'attack';
-  const attackMin = 0.0001;
-  const attackMax = 10;
   const attackDefault = 0.001;
 
   const decayKey = 'decay';
-  const decayMin = 0.0001;
-  const decayMax = 10;
   const decayDefault = 0.6;
 
   const sustainKey = 'sustain';
-  const sustainMin = 0;
-  const sustainMax = 1;
   const sustainDefault = 0.7;
 
   const releaseKey = 'release';
-  const releaseMin = 0.0001;
-  const releaseMax = 10;
   const releaseDefault = 0.6;
 
   const freqKey = 'freq';
@@ -190,9 +183,7 @@ function SynthPageMain({ctxRef, coreRef}: SynthPageMainProps) {
           <KnobsContainer>
             <KnobInput
               title='Attack'
-              unit='time'
-              min={attackMin}
-              max={attackMax}
+              kind='adr'
               defaultValue={attackDefault}
               constRef={attackRef}
               constKey={attackKey}
@@ -200,9 +191,7 @@ function SynthPageMain({ctxRef, coreRef}: SynthPageMainProps) {
             />
             <KnobInput
               title='Decay'
-              unit='time'
-              min={decayMin}
-              max={decayMax}
+              kind='adr'
               defaultValue={decayDefault}
               constRef={decayRef}
               constKey={decayKey}
@@ -210,9 +199,7 @@ function SynthPageMain({ctxRef, coreRef}: SynthPageMainProps) {
             />
             <KnobInput
               title='Sustain'
-              unit='percentage'
-              min={sustainMin}
-              max={sustainMax}
+              kind='percentage'
               defaultValue={sustainDefault}
               constRef={sustainRef}
               constKey={sustainKey}
@@ -220,9 +207,7 @@ function SynthPageMain({ctxRef, coreRef}: SynthPageMainProps) {
             />
             <KnobInput
               title='Release'
-              unit='time'
-              min={releaseMin}
-              max={releaseMax}
+              kind='adr'
               defaultValue={releaseDefault}
               constRef={releaseRef}
               constKey={releaseKey}
@@ -235,31 +220,29 @@ function SynthPageMain({ctxRef, coreRef}: SynthPageMainProps) {
   );
 }
 
-type KnobInputProps = Pick<KnobProps, 'title' | 'unit' | 'min' | 'max'> & {
+type KnobInputProps = {
+  kind: 'percentage' | 'adr';
+  title: string;
   defaultValue: number;
   constRef: React.MutableRefObject<NodeRepr_t>;
   constKey: string;
   onChange: () => void;
 };
 function KnobInput({
+  kind,
   title,
-  unit,
-  min,
-  max,
   defaultValue,
   constRef,
   constKey,
   onChange,
 }: KnobInputProps) {
   const [value, setValue] = useState<number>(defaultValue);
+  const KnobComponent = kind === 'percentage' ? KnobPercentage : KnobAdr;
   return (
-    <Knob
+    <KnobComponent
       title={title}
-      unit={unit}
       value={value}
       defaultValue={defaultValue}
-      min={min}
-      max={max}
       onChange={(newValue) => {
         constRef.current = el.const({key: constKey, value: newValue});
         setValue(newValue);
