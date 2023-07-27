@@ -29,10 +29,10 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
       <body
         className={clsx(
           font.className,
-          'bg-gray-200 text-stone-950 selection:bg-blue-500 selection:text-white',
+          'bg-brand-gray-1 text-brand-gray-7 selection:bg-blue-500 selection:text-white',
         )}
       >
-        <div className='mx-auto max-w-screen-2xl'>{children}</div>
+        {children}
       </body>
     </html>
   );
