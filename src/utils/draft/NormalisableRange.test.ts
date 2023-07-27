@@ -15,6 +15,11 @@ describe('NormalisableRange', () => {
     console.debug('nr.snapToLegalValue(37.777): ', nr.snapToLegalValue(37.777));
     console.debug('nr.snapToLegalValue(19000): ', nr.snapToLegalValue(19000));
 
+    console.debug('nr.convertTo0to1(30): ', nr.convertTo0to1(30));
+    console.debug('nr.convertTo0to1(60): ', nr.convertTo0to1(60));
+    console.debug('nr.convertTo0to1(120): ', nr.convertTo0to1(120));
+    console.debug('nr.convertTo0to1(745): ', nr.convertTo0to1(745));
+    console.debug('nr.convertTo0to1(5000): ', nr.convertTo0to1(5000));
     console.debug('nr.convertTo0to1(18500): ', nr.convertTo0to1(18500));
   });
 });
