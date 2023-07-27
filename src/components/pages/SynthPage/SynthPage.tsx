@@ -9,8 +9,13 @@ import {InteractionArea} from '@/components/ui/InteractionArea';
 import {PlayIcon} from '@/components/icons/PlayIcon';
 import {SynthContainer} from './SynthContainer';
 import {PageElementContainer} from './PageElementContainer';
+import {SynthPageSkeleton} from './SynthPageSkeleton';
+import {KnobsContainer} from './KnobsContainer';
+import {title} from './constants';
 
 export function SynthPage() {
+  const [isReady, setIsReady] = useState<boolean>(false);
+
   const ctxRef = useRef<AudioContext>();
   const coreRef = useRef<WebAudioRenderer>();
 
@@ -30,8 +35,33 @@ export function SynthPage() {
       const node = await core.initialize(ctx);
       node.connect(ctx.destination);
     })();
+
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    core.on('load', () => {
+      timeoutId = setTimeout(() => {
+        setIsReady(true);
+      }, 500); // Giving 0.5s more, so UI won't be too janky
+    });
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, []);
 
+  if (!isReady) {
+    return <SynthPageSkeleton />;
+  }
+
+  return <SynthPageMain ctxRef={ctxRef} coreRef={coreRef} />;
+}
+
+type SynthPageMainProps = {
+  ctxRef: React.MutableRefObject<AudioContext | undefined>;
+  coreRef: React.MutableRefObject<WebAudioRenderer | undefined>;
+};
+
+function SynthPageMain({ctxRef, coreRef}: SynthPageMainProps) {
   const gateKey = 'gate';
   const gateOff = 0;
   const gateOn = 1;
@@ -156,8 +186,8 @@ export function SynthPage() {
       }
     >
       <PageElementContainer>
-        <SynthContainer title='Simple Synth'>
-          <div className='flex flex-wrap justify-center gap-3'>
+        <SynthContainer title={title}>
+          <KnobsContainer>
             <KnobInput
               title='Attack'
               unit='time'
@@ -198,7 +228,7 @@ export function SynthPage() {
               constKey={releaseKey}
               onChange={renderAudio}
             />
-          </div>
+          </KnobsContainer>
         </SynthContainer>
       </PageElementContainer>
     </Centered>

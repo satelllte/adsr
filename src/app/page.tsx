@@ -2,6 +2,7 @@
 import {Suspense, lazy, useState} from 'react';
 import {PlayIcon} from '@/components/icons/PlayIcon';
 import {Centered} from '@/components/layout/Centered';
+import {SynthPageSkeleton} from '@/components/pages/SynthPage';
 
 const SynthPage = lazy(async () => {
   const {SynthPage} = await import('@/components/pages/SynthPage');
@@ -30,7 +31,7 @@ export default function IndexPage() {
   }
 
   return (
-    <Suspense>
+    <Suspense fallback={<SynthPageSkeleton />}>
       <SynthPage />
     </Suspense>
   );
