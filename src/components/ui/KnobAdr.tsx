@@ -1,5 +1,5 @@
 import {Knob, type KnobProps} from './Knob';
-import {NR} from '@/utils/math/draft';
+import {NormalisableRange} from '@/utils/math';
 import {useConst} from '@/components/hooks/useConst';
 
 export type KnobAdrProps = Omit<
@@ -11,7 +11,7 @@ export function KnobAdr(props: KnobAdrProps) {
   const min = 0.000004; // Limiting to 0.004 ms, because otherwise it'll sound weird when it's too close to the absolute zero
   const max = 60;
 
-  const nr = useConst(() => new NR(min, max, 1.88));
+  const nr = useConst(() => new NormalisableRange(min, max, 1.88));
   const mapTo01 = (x: number) => nr.mapTo01(x);
   const mapFrom01 = (x: number) => nr.mapFrom01(x);
 

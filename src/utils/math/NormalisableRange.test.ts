@@ -1,9 +1,9 @@
 import {describe, expect, it} from 'vitest';
-import {NR} from './NR';
+import {NormalisableRange} from './NormalisableRange';
 
-describe('NR', () => {
+describe('NormalisableRange', () => {
   it('works linearly when perfectly centered', () => {
-    const nr = new NR(10000, 20000, 15000);
+    const nr = new NormalisableRange(10000, 20000, 15000);
 
     expect(nr.mapTo01(10000)).toBe(0);
     expect(nr.mapTo01(12500)).toBe(0.25);
@@ -17,7 +17,7 @@ describe('NR', () => {
   });
 
   it('interpolates with skew when the center is off', () => {
-    const nr = new NR(100, 200, 110);
+    const nr = new NormalisableRange(100, 200, 110);
 
     expect(nr.mapTo01(100)).toBe(0);
     expect(nr.mapTo01(105)).toBeCloseTo(0.405);

@@ -1,7 +1,16 @@
-import {clamp01} from '../clamp';
+import {clamp01} from './clamp';
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export class NR {
+/**
+ * Partial implementation of the "NormalisableRange" class from JUCE Framework.
+ * In particular, the only part taken from JUCE is "skew" calculation by given "center" point of the range.
+ * ---
+ * Useful for making logarithmic interpolations for things like frequency inputs, ADR inputs, etc.
+ * ---
+ * References:
+ * - https://docs.juce.com/master/classNormalisableRange.html
+ * - https://github.com/juce-framework/JUCE/blob/master/modules/juce_core/maths/juce_NormalisableRange.h
+ */
+export class NormalisableRange {
   private readonly _min: number;
   private readonly _max: number;
   private readonly _skew: number;
