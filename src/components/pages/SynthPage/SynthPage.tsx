@@ -42,7 +42,7 @@ export function SynthPage() {
     core.on('load', () => {
       timeoutId = setTimeout(() => {
         setIsReady(true);
-      }, 500); // Giving 0.5s more, so UI won't be too janky
+      }, 500); // Giving 0.5s more, so UI won't be janky when this component lazy-loaded very quickly.
     });
 
     return () => {
