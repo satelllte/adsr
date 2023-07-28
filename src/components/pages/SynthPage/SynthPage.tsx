@@ -54,15 +54,26 @@ export function SynthPage() {
     return <SynthPageSkeleton />;
   }
 
-  return <SynthPageMain ctxRef={ctxRef} coreRef={coreRef} />;
+  const ctx = ctxRef.current;
+  const core = coreRef.current;
+
+  if (!ctx) {
+    throw new Error("Audio context wasn't initialized properly");
+  }
+
+  if (!core) {
+    throw new Error("Elementary core wasn't initialized properly");
+  }
+
+  return <SynthPageMain ctx={ctx} core={core} />;
 }
 
 type SynthPageMainProps = {
-  ctxRef: React.MutableRefObject<AudioContext | undefined>;
-  coreRef: React.MutableRefObject<WebAudioRenderer | undefined>;
+  ctx: AudioContext;
+  core: WebAudioRenderer;
 };
 
-function SynthPageMain({ctxRef, coreRef}: SynthPageMainProps) {
+function SynthPageMain({ctx, core}: SynthPageMainProps) {
   const gateOff = 0;
   const gateOn = 1;
   const gateKey = 'gate';
@@ -103,12 +114,6 @@ function SynthPageMain({ctxRef, coreRef}: SynthPageMainProps) {
   );
 
   const renderAudio = useCallback(async () => {
-    const ctx = ctxRef.current;
-    const core = coreRef.current;
-    if (!ctx || !core) {
-      throw new Error("Audio core wasn't initialized properly");
-    }
-
     if (ctx.state !== 'running') {
       await ctx.resume();
     }
@@ -123,7 +128,7 @@ function SynthPageMain({ctxRef, coreRef}: SynthPageMainProps) {
     const sine = el.cycle(freq);
     const out = el.mul(envelope, sine);
     core.render(out, out);
-  }, [coreRef, ctxRef]);
+  }, [ctx, core]);
 
   const play = useCallback(() => {
     gateRef.current = el.const({key: gateKey, value: gateOn});
