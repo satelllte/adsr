@@ -69,7 +69,7 @@ export function Knob({
   return (
     <div
       className='flex w-16 select-none flex-col items-center text-xs outline-none focus:outline-dashed focus:outline-1 focus:outline-gray-4'
-      tabIndex={0} // Making element focusable and be accessible with Tab key. Details: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex
+      tabIndex={-1} // Making element focusable by mouse / touch (not Tab). Details: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex
       onKeyDown={onKeyDown}
       onPointerDown={(event) => {
         // Touch devices have a delay before focusing so it won't focus if touch immediately moves away from target (sliding). We want thumb to focus regardless.
