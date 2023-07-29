@@ -1,7 +1,6 @@
 'use client';
 import {Suspense, lazy, useState} from 'react';
 import {PlayIcon} from '@/components/icons/PlayIcon';
-import {Centered} from '@/components/layout/Centered';
 import {SynthPageSkeleton} from '@/components/pages/SynthPage';
 
 const SynthPage = lazy(async () => {
@@ -18,7 +17,7 @@ export default function IndexPage() {
 
   if (!isLaunched) {
     return (
-      <Centered>
+      <div className='absolute inset-0 flex flex-col items-center justify-center'>
         <button
           type='button'
           className='cursor-default bg-gray-2 px-8 py-2 outline-none webkit-tap-transparent hover:bg-gray-3 focus-visible:outline-1 focus-visible:outline-gray-5 active:bg-gray-4 md:px-10 lg:px-12 lg:py-3'
@@ -26,7 +25,7 @@ export default function IndexPage() {
         >
           <PlayIcon />
         </button>
-      </Centered>
+      </div>
     );
   }
 
