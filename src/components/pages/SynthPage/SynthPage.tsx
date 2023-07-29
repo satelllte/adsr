@@ -74,10 +74,8 @@ type SynthPageMainProps = {
 };
 
 function SynthPageMain({ctx, core}: SynthPageMainProps) {
-  const gateOff = 0;
-  const gateOn = 1;
   const gateKey = 'gate';
-  const gateDefault = gateOff;
+  const gateDefault = 0;
 
   const attackKey = 'attack';
   const attackDefault = 0.001;
@@ -131,12 +129,12 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
   }, [ctx, core]);
 
   const play = useCallback(() => {
-    gateRef.current = el.const({key: gateKey, value: gateOn});
+    gateRef.current = el.const({key: gateKey, value: 1});
     void renderAudio();
   }, [renderAudio]);
 
   const stop = useCallback(() => {
-    gateRef.current = el.const({key: gateKey, value: gateOff});
+    gateRef.current = el.const({key: gateKey, value: 0});
     void renderAudio();
   }, [renderAudio]);
 
