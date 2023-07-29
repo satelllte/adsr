@@ -6,8 +6,8 @@ import './style.css';
 // eslint-disable-next-line new-cap
 const font = Montserrat({subsets: ['latin']});
 
-const title = 'Simple Synth';
-const description = 'Simple synthesizer built with Elementary Audio';
+const title = 'ADSR';
+const description = 'ADSR - simple synthesizer built with Elementary Audio';
 
 export const metadata: Metadata = {
   title,
