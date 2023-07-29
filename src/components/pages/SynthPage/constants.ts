@@ -1,1 +1,1 @@
-export const title = 'Simple Synth';
+export const title = 'ADSR';
