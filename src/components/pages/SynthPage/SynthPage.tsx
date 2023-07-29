@@ -12,7 +12,7 @@ import {PlayIcon} from '@/components/icons/PlayIcon';
 import {SynthContainer} from './SynthContainer';
 import {PageElementContainer} from './PageElementContainer';
 import {SynthPageSkeleton} from './SynthPageSkeleton';
-import {KnobsContainer} from './KnobsContainer';
+import {KnobsLayout} from './KnobsLayout';
 import {title} from './constants';
 
 export function SynthPage() {
@@ -186,7 +186,7 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
     >
       <PageElementContainer>
         <SynthContainer isActivated title={title}>
-          <KnobsContainer>
+          <KnobsLayout>
             <KnobInput
               title='Frequency'
               kind='frequency'
@@ -195,8 +195,6 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
               constKey={freqKey}
               onChange={renderAudio}
             />
-          </KnobsContainer>
-          <KnobsContainer>
             <KnobInput
               title='Attack'
               kind='adr'
@@ -229,7 +227,7 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
               constKey={releaseKey}
               onChange={renderAudio}
             />
-          </KnobsContainer>
+          </KnobsLayout>
         </SynthContainer>
       </PageElementContainer>
     </Centered>

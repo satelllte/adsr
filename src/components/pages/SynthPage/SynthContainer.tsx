@@ -13,7 +13,7 @@ export function SynthContainer({
 }: SynthContainerProps) {
   return (
     <div className='bg-gray-2'>
-      <div className='flex select-none items-center gap-2 bg-gray-1 px-2 py-1 text-sm'>
+      <div className='flex select-none items-center gap-2 bg-gray-1 px-2 py-1 text-sm uppercase'>
         <div
           className={clsx(
             'h-2 w-2 rounded-full',
@@ -22,7 +22,7 @@ export function SynthContainer({
         />
         {title}
       </div>
-      <div className='p-4'>{children}</div>
+      <div className='p-2 sm:p-4'>{children}</div>
     </div>
   );
 }

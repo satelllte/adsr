@@ -1,7 +1,7 @@
 import {Centered} from '@/components/layout/Centered';
 import {SynthContainer} from './SynthContainer';
 import {PageElementContainer} from './PageElementContainer';
-import {KnobsContainer} from './KnobsContainer';
+import {KnobsLayout} from './KnobsLayout';
 import {KnobSkeleton} from '@/components/ui/KnobSkeleton';
 import {title} from './constants';
 
@@ -10,12 +10,13 @@ export function SynthPageSkeleton() {
     <Centered>
       <PageElementContainer>
         <SynthContainer title={title}>
-          <KnobsContainer>
+          <KnobsLayout>
             <KnobSkeleton />
             <KnobSkeleton />
             <KnobSkeleton />
             <KnobSkeleton />
-          </KnobsContainer>
+            <KnobSkeleton />
+          </KnobsLayout>
         </SynthContainer>
       </PageElementContainer>
     </Centered>
