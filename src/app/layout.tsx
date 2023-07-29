@@ -6,8 +6,9 @@ import './style.css';
 // eslint-disable-next-line new-cap
 const font = Montserrat({subsets: ['latin']});
 
-const title = 'Simple Synth';
-const description = 'Simple synthesizer built with Elementary Audio';
+const title = 'ADSR';
+const description = 'ADSR - simple synthesizer built with Elementary Audio';
+const images = ['/plugin-screenshot.png'];
 
 export const metadata: Metadata = {
   title,
@@ -16,23 +17,20 @@ export const metadata: Metadata = {
     title,
     description,
     siteName: title,
+    images,
   },
   twitter: {
     title,
     description,
+    images,
   },
 };
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang='en'>
-      <body
-        className={clsx(
-          font.className,
-          'bg-gray-200 text-stone-950 selection:bg-blue-500 selection:text-white',
-        )}
-      >
-        <div className='mx-auto max-w-screen-2xl'>{children}</div>
+      <body className={clsx(font.className, 'bg-gray-0 text-gray-7')}>
+        {children}
       </body>
     </html>
   );

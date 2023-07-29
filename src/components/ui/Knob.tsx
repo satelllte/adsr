@@ -1,46 +1,50 @@
-'use client';
 import {keyCodes} from '@/constants/key-codes';
-import {clamp01, mapFrom01Range, mapTo01Range} from '@/utils/math';
+import {clamp01, mapFrom01Linear, mapTo01Linear} from '@/utils/math';
 import {useDrag} from '@use-gesture/react';
+import clsx from 'clsx';
 import {useId} from 'react';
 
-export type KnobUnit = 'time' | 'percentage';
-
 export type KnobProps = {
+  isLarge?: boolean;
   title: string;
-  unit: KnobUnit;
   value: number;
   defaultValue: number;
   min: number;
   max: number;
   onChange: (newValue: number) => void;
+  displayValueFn: (value: number) => string;
+  mapTo01?: (x: number, min: number, max: number) => number;
+  mapFrom01?: (x: number, min: number, max: number) => number;
 };
 
 export function Knob({
+  isLarge = false,
   title,
-  unit,
   value,
   defaultValue,
   min,
   max,
   onChange,
+  displayValueFn,
+  mapTo01 = mapTo01Linear,
+  mapFrom01 = mapFrom01Linear,
 }: KnobProps) {
   const id = useId();
 
-  const value01 = mapTo01Range(value, min, max);
-  const valueText = `${renderValue(value, unit)} ${renderUnit(unit)}`;
+  const value01 = mapTo01(value, min, max);
+  const valueText = displayValueFn(value);
 
   const angleMin = -145; // The minumum knob position angle, when x = 0
   const angleMax = 145; // The maximum knob position angle, when x = 1
-  const angle = mapFrom01Range(value01, angleMin, angleMax);
+  const angle = mapFrom01Linear(value01, angleMin, angleMax);
 
   const changeValueBy = (diff01: number): void => {
     const newValue01 = clamp01(value01 + diff01);
-    onChange(mapFrom01Range(newValue01, min, max));
+    onChange(mapFrom01(newValue01, min, max));
   };
 
   const changeValueTo = (newValue01: number): void => {
-    onChange(mapFrom01Range(newValue01, min, max));
+    onChange(mapFrom01(newValue01, min, max));
   };
 
   const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = ({code}) => {
@@ -55,7 +59,7 @@ export function Knob({
     }
 
     if (code === keyCodes.backspace || code === keyCodes.delete) {
-      const defaultValue01 = mapTo01Range(defaultValue, min, max);
+      const defaultValue01 = mapTo01(defaultValue, min, max);
       changeValueTo(defaultValue01);
     }
   };
@@ -67,8 +71,11 @@ export function Knob({
 
   return (
     <div
-      className='flex w-16 select-none flex-col items-center text-sm outline-none focus:outline-dashed focus:outline-1 focus:outline-slate-950'
-      tabIndex={0} // Making element focusable and be accessible with Tab key. Details: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex
+      className={clsx(
+        'flex select-none flex-col items-center text-xs outline-none focus:outline-dashed focus:outline-1 focus:outline-gray-4',
+        isLarge ? 'w-20' : 'w-16',
+      )}
+      tabIndex={-1} // Making element focusable by mouse / touch (not Tab). Details: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex
       onKeyDown={onKeyDown}
       onPointerDown={(event) => {
         // Touch devices have a delay before focusing so it won't focus if touch immediately moves away from target (sliding). We want thumb to focus regardless.
@@ -79,7 +86,10 @@ export function Knob({
       <label htmlFor={id}>{title}</label>
       <div
         id={id}
-        className='relative h-12 w-12 touch-none' // It's recommended to disable "touch-action" for use-gesture: https://use-gesture.netlify.app/docs/extras/#touch-action
+        className={clsx(
+          'relative touch-none', // It's recommended to disable "touch-action" for use-gesture: https://use-gesture.netlify.app/docs/extras/#touch-action
+          isLarge ? 'h-16 w-16' : 'h-12 w-12',
+        )}
         role='slider'
         aria-valuenow={value}
         aria-valuemin={min}
@@ -88,12 +98,12 @@ export function Knob({
         aria-orientation='vertical'
         {...bindDrag()}
       >
-        <div className='absolute h-full w-full rounded-full bg-gray-300'>
+        <div className='absolute h-full w-full rounded-full bg-gray-3'>
           <div
             className='absolute h-full w-full'
             style={{rotate: `${angle}deg`}}
           >
-            <div className='absolute left-1/2 top-0 h-1/2 w-[2px] -translate-x-1/2 rounded-sm bg-stone-950' />
+            <div className='absolute left-1/2 top-0 h-1/2 w-[2px] -translate-x-1/2 rounded-sm bg-gray-7' />
           </div>
         </div>
       </div>
@@ -101,22 +111,3 @@ export function Knob({
     </div>
   );
 }
-
-const renderValue = (value: number, unit: KnobUnit): string => {
-  if (unit === 'percentage') {
-    return parseFloat(`${value * 100}`).toFixed(0);
-  }
-
-  return parseFloat(`${value}`).toFixed(2);
-};
-
-const renderUnit = (unit: KnobUnit): string => {
-  switch (unit) {
-    case 'time':
-      return 's';
-    case 'percentage':
-      return '%';
-    default:
-      return unit;
-  }
-};

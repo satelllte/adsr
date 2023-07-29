@@ -1,6 +1,8 @@
-# Elementary Audio: Simple Synth
+# ADSR
 
-Simple synthesizer built with Elementary Audio.
+Simple synthesizer built with [Elementary Audio](https://www.elementary.audio/) framework.
+
+<img src="./public/plugin-screenshot.png">
 
 ## Development
 
