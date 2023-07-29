@@ -5,6 +5,7 @@ import {el, type NodeRepr_t} from '@elemaudio/core';
 import {keyCodes} from '@/constants/key-codes';
 import {KnobPercentage} from '@/components/ui/KnobPercentage';
 import {KnobAdr} from '@/components/ui/KnobAdr';
+import {KnobFrequency} from '@/components/ui/KnobFrequency';
 import {Centered} from '@/components/layout/Centered';
 import {InteractionArea} from '@/components/ui/InteractionArea';
 import {PlayIcon} from '@/components/icons/PlayIcon';
@@ -92,7 +93,7 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
   const releaseDefault = 0.6;
 
   const freqKey = 'freq';
-  const freqDefault = 220;
+  const freqDefault = 440;
 
   const gateRef = useRef<NodeRepr_t>(
     el.const({key: gateKey, value: gateDefault}),
@@ -187,6 +188,16 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
         <SynthContainer isActivated title={title}>
           <KnobsContainer>
             <KnobInput
+              title='Frequency'
+              kind='frequency'
+              defaultValue={freqDefault}
+              constRef={freqRef}
+              constKey={freqKey}
+              onChange={renderAudio}
+            />
+          </KnobsContainer>
+          <KnobsContainer>
+            <KnobInput
               title='Attack'
               kind='adr'
               defaultValue={attackDefault}
@@ -225,8 +236,9 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
   );
 }
 
+type KnobInputKind = 'percentage' | 'adr' | 'frequency';
 type KnobInputProps = {
-  kind: 'percentage' | 'adr';
+  kind: KnobInputKind;
   title: string;
   defaultValue: number;
   constRef: React.MutableRefObject<NodeRepr_t>;
@@ -242,7 +254,7 @@ function KnobInput({
   onChange,
 }: KnobInputProps) {
   const [value, setValue] = useState<number>(defaultValue);
-  const KnobComponent = kind === 'percentage' ? KnobPercentage : KnobAdr;
+  const KnobComponent = resolveKnobComponent(kind);
   return (
     <KnobComponent
       title={title}
@@ -256,3 +268,16 @@ function KnobInput({
     />
   );
 }
+
+const resolveKnobComponent = (kind: KnobInputKind) => {
+  switch (kind) {
+    case 'percentage':
+      return KnobPercentage;
+    case 'adr':
+      return KnobAdr;
+    case 'frequency':
+      return KnobFrequency;
+    default:
+      throw new Error('Unknown knob kind', kind);
+  }
+};
