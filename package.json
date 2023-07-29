@@ -1,6 +1,6 @@
 {
-  "name": "elementary-simple-synth",
-  "private": true,
+  "name": "adsr",
+  "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
