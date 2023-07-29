@@ -73,7 +73,7 @@ export function Knob({
     <div
       className={clsx(
         'flex select-none flex-col items-center text-xs outline-none focus:outline-dashed focus:outline-1 focus:outline-gray-4',
-        isLarge ? 'w-16 sm:w-20' : 'w-12 sm:w-16',
+        isLarge ? 'w-20' : 'w-16',
       )}
       tabIndex={-1} // Making element focusable by mouse / touch (not Tab). Details: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex
       onKeyDown={onKeyDown}
@@ -88,7 +88,7 @@ export function Knob({
         id={id}
         className={clsx(
           'relative touch-none', // It's recommended to disable "touch-action" for use-gesture: https://use-gesture.netlify.app/docs/extras/#touch-action
-          isLarge ? 'h-12 w-12 sm:h-16 sm:w-16' : 'h-8 w-8 sm:h-12 sm:w-12',
+          isLarge ? 'h-16 w-16' : 'h-12 w-12',
         )}
         role='slider'
         aria-valuenow={value}

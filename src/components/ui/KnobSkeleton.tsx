@@ -9,7 +9,7 @@ export function KnobSkeleton({isLarge = false}: KnobSkeletonProps) {
     <div
       className={clsx(
         'bg-gray-3 motion-safe:animate-pulse',
-        isLarge ? 'h-20 w-16 sm:h-24 sm:w-20' : 'h-16 w-12 sm:h-20 sm:w-16',
+        isLarge ? 'h-24 w-20' : 'h-20 w-16',
       )}
     />
   );
