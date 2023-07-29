@@ -27,24 +27,24 @@ export function KnobAdr(props: KnobAdrProps) {
   );
 }
 
-const displayValueFn = (valueSec: number) => {
-  const valueMs = valueSec * 1000;
+const displayValueFn = (s: number) => {
+  const ms = s * 1000;
 
-  if (valueMs < 10) {
-    return `${valueMs.toFixed(2)} ms`;
+  if (ms < 10) {
+    return `${ms.toFixed(2)} ms`;
   }
 
-  if (valueMs < 100) {
-    return `${valueMs.toFixed(1)} ms`;
+  if (ms < 100) {
+    return `${ms.toFixed(1)} ms`;
   }
 
-  if (valueMs < 1000) {
-    return `${valueMs.toFixed(0)} ms`;
+  if (ms < 1000) {
+    return `${ms.toFixed(0)} ms`;
   }
 
-  if (valueMs < 10000) {
-    return `${valueSec.toFixed(2)} s`;
+  if (ms < 10000) {
+    return `${s.toFixed(2)} s`;
   }
 
-  return `${valueSec.toFixed(1)} s`;
+  return `${s.toFixed(1)} s`;
 };
