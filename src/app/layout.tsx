@@ -8,6 +8,7 @@ const font = Montserrat({subsets: ['latin']});
 
 const title = 'ADSR';
 const description = 'ADSR - simple synthesizer built with Elementary Audio';
+const images = ['/plugin-screenshot.png'];
 
 export const metadata: Metadata = {
   title,
@@ -16,10 +17,12 @@ export const metadata: Metadata = {
     title,
     description,
     siteName: title,
+    images,
   },
   twitter: {
     title,
     description,
+    images,
   },
 };
 
