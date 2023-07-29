@@ -2,7 +2,7 @@
 
 Simple synthesizer built with [Elementary Audio](https://www.elementary.audio/) framework.
 
-<img src="./public/plugin-screenshot.png">
+<img src="./public/plugin-screenshot.png" width="600">
 
 ## Development
 
