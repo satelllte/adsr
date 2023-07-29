@@ -77,6 +77,9 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
   const gateKey = 'gate';
   const gateDefault = 0;
 
+  const freqKey = 'freq';
+  const freqDefault = 440;
+
   const attackKey = 'attack';
   const attackDefault = 0.001;
 
@@ -89,11 +92,11 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
   const releaseKey = 'release';
   const releaseDefault = 0.6;
 
-  const freqKey = 'freq';
-  const freqDefault = 440;
-
   const gateRef = useRef<NodeRepr_t>(
     el.const({key: gateKey, value: gateDefault}),
+  );
+  const freqRef = useRef<NodeRepr_t>(
+    el.const({key: freqKey, value: freqDefault}),
   );
   const attackRef = useRef<NodeRepr_t>(
     el.const({key: attackKey, value: attackDefault}),
@@ -107,21 +110,18 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
   const releaseRef = useRef<NodeRepr_t>(
     el.const({key: releaseKey, value: releaseDefault}),
   );
-  const freqRef = useRef<NodeRepr_t>(
-    el.const({key: freqKey, value: freqDefault}),
-  );
 
   const renderAudio = useCallback(async () => {
     if (ctx.state !== 'running') {
       await ctx.resume();
     }
 
+    const gate = gateRef.current;
+    const freq = freqRef.current;
     const attack = attackRef.current;
     const decay = decayRef.current;
     const sustain = sustainRef.current;
     const release = releaseRef.current;
-    const gate = gateRef.current;
-    const freq = freqRef.current;
     const envelope = el.adsr(attack, decay, sustain, release, gate);
     const sine = el.cycle(freq);
     const out = el.mul(envelope, sine);
