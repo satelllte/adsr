@@ -22,7 +22,7 @@ export function SynthContainer({
         />
         {title}
       </div>
-      <div className='p-2 sm:p-4'>{children}</div>
+      <div className='p-2 sm:p-3'>{children}</div>
     </div>
   );
 }

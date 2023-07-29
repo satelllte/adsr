@@ -188,6 +188,7 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
         <SynthContainer isActivated title={title}>
           <KnobsLayout>
             <KnobInput
+              isLarge
               title='Frequency'
               kind='frequency'
               defaultValue={freqDefault}
@@ -236,6 +237,7 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
 
 type KnobInputKind = 'percentage' | 'adr' | 'frequency';
 type KnobInputProps = {
+  isLarge?: boolean;
   kind: KnobInputKind;
   title: string;
   defaultValue: number;
@@ -244,6 +246,7 @@ type KnobInputProps = {
   onChange: () => void;
 };
 function KnobInput({
+  isLarge,
   kind,
   title,
   defaultValue,
@@ -255,6 +258,7 @@ function KnobInput({
   const KnobComponent = resolveKnobComponent(kind);
   return (
     <KnobComponent
+      isLarge={isLarge}
       title={title}
       value={value}
       defaultValue={defaultValue}

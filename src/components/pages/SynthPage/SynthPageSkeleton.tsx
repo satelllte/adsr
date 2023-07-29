@@ -11,7 +11,7 @@ export function SynthPageSkeleton() {
       <PageElementContainer>
         <SynthContainer title={title}>
           <KnobsLayout>
-            <KnobSkeleton />
+            <KnobSkeleton isLarge />
             <KnobSkeleton />
             <KnobSkeleton />
             <KnobSkeleton />

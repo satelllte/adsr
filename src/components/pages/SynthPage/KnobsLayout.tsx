@@ -14,10 +14,10 @@ export function KnobsLayout({children}: KnobsLayoutProps) {
       <div className='col-span-2 flex justify-center sm:justify-start'>
         {children[0]}
       </div>
-      {children[1]}
-      {children[2]}
-      {children[3]}
-      {children[4]}
+      <div className='flex items-center justify-center'>{children[1]}</div>
+      <div className='flex items-center justify-center'>{children[2]}</div>
+      <div className='flex items-center justify-center'>{children[3]}</div>
+      <div className='flex items-center justify-center'>{children[4]}</div>
     </div>
   );
 }

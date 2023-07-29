@@ -1,9 +1,11 @@
 import {keyCodes} from '@/constants/key-codes';
 import {clamp01, mapFrom01Linear, mapTo01Linear} from '@/utils/math';
 import {useDrag} from '@use-gesture/react';
+import clsx from 'clsx';
 import {useId} from 'react';
 
 export type KnobProps = {
+  isLarge?: boolean;
   title: string;
   value: number;
   defaultValue: number;
@@ -16,6 +18,7 @@ export type KnobProps = {
 };
 
 export function Knob({
+  isLarge = false,
   title,
   value,
   defaultValue,
@@ -68,7 +71,10 @@ export function Knob({
 
   return (
     <div
-      className='flex w-16 select-none flex-col items-center text-xs outline-none focus:outline-dashed focus:outline-1 focus:outline-gray-4'
+      className={clsx(
+        'flex select-none flex-col items-center text-xs outline-none focus:outline-dashed focus:outline-1 focus:outline-gray-4',
+        isLarge ? 'w-16 sm:w-20' : 'w-12 sm:w-16',
+      )}
       tabIndex={-1} // Making element focusable by mouse / touch (not Tab). Details: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex
       onKeyDown={onKeyDown}
       onPointerDown={(event) => {
@@ -80,7 +86,10 @@ export function Knob({
       <label htmlFor={id}>{title}</label>
       <div
         id={id}
-        className='relative h-12 w-12 touch-none' // It's recommended to disable "touch-action" for use-gesture: https://use-gesture.netlify.app/docs/extras/#touch-action
+        className={clsx(
+          'relative touch-none', // It's recommended to disable "touch-action" for use-gesture: https://use-gesture.netlify.app/docs/extras/#touch-action
+          isLarge ? 'h-12 w-12 sm:h-16 sm:w-16' : 'h-8 w-8 sm:h-12 sm:w-12',
+        )}
         role='slider'
         aria-valuenow={value}
         aria-valuemin={min}
