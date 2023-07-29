@@ -6,14 +6,13 @@ import {keyCodes} from '@/constants/key-codes';
 import {KnobPercentage} from '@/components/ui/KnobPercentage';
 import {KnobAdr} from '@/components/ui/KnobAdr';
 import {KnobFrequency} from '@/components/ui/KnobFrequency';
-import {Centered} from '@/components/layout/Centered';
 import {InteractionArea} from '@/components/ui/InteractionArea';
 import {PlayIcon} from '@/components/icons/PlayIcon';
 import {SynthContainer} from './SynthContainer';
-import {PageElementContainer} from './PageElementContainer';
 import {SynthPageSkeleton} from './SynthPageSkeleton';
 import {KnobsLayout} from './KnobsLayout';
 import {title} from './constants';
+import {SynthPageLayout} from './SynthPageLayout';
 
 export function SynthPage() {
   const [isReady, setIsReady] = useState<boolean>(false);
@@ -168,70 +167,61 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
   }, [play, stop]);
 
   return (
-    <Centered
-      bottomArea={
-        <PageElementContainer>
-          <div className='py-4'>
-            <InteractionArea
-              icon={<PlayIcon />}
-              title={"Touch here to play or press the 'Space' key."}
-              onTouchStart={play}
-              onTouchEnd={stop}
-              onMouseDown={play}
-              onMouseUp={stop}
-            />
-          </div>
-        </PageElementContainer>
-      }
-    >
-      <PageElementContainer>
-        <SynthContainer isActivated title={title}>
-          <KnobsLayout>
-            <KnobInput
-              isLarge
-              title='Frequency'
-              kind='frequency'
-              defaultValue={freqDefault}
-              constRef={freqRef}
-              constKey={freqKey}
-              onChange={renderAudio}
-            />
-            <KnobInput
-              title='Attack'
-              kind='adr'
-              defaultValue={attackDefault}
-              constRef={attackRef}
-              constKey={attackKey}
-              onChange={renderAudio}
-            />
-            <KnobInput
-              title='Decay'
-              kind='adr'
-              defaultValue={decayDefault}
-              constRef={decayRef}
-              constKey={decayKey}
-              onChange={renderAudio}
-            />
-            <KnobInput
-              title='Sustain'
-              kind='percentage'
-              defaultValue={sustainDefault}
-              constRef={sustainRef}
-              constKey={sustainKey}
-              onChange={renderAudio}
-            />
-            <KnobInput
-              title='Release'
-              kind='adr'
-              defaultValue={releaseDefault}
-              constRef={releaseRef}
-              constKey={releaseKey}
-              onChange={renderAudio}
-            />
-          </KnobsLayout>
-        </SynthContainer>
-      </PageElementContainer>
-    </Centered>
+    <SynthPageLayout>
+      <SynthContainer isActivated title={title}>
+        <KnobsLayout>
+          <KnobInput
+            isLarge
+            title='Frequency'
+            kind='frequency'
+            defaultValue={freqDefault}
+            constRef={freqRef}
+            constKey={freqKey}
+            onChange={renderAudio}
+          />
+          <KnobInput
+            title='Attack'
+            kind='adr'
+            defaultValue={attackDefault}
+            constRef={attackRef}
+            constKey={attackKey}
+            onChange={renderAudio}
+          />
+          <KnobInput
+            title='Decay'
+            kind='adr'
+            defaultValue={decayDefault}
+            constRef={decayRef}
+            constKey={decayKey}
+            onChange={renderAudio}
+          />
+          <KnobInput
+            title='Sustain'
+            kind='percentage'
+            defaultValue={sustainDefault}
+            constRef={sustainRef}
+            constKey={sustainKey}
+            onChange={renderAudio}
+          />
+          <KnobInput
+            title='Release'
+            kind='adr'
+            defaultValue={releaseDefault}
+            constRef={releaseRef}
+            constKey={releaseKey}
+            onChange={renderAudio}
+          />
+        </KnobsLayout>
+      </SynthContainer>
+      <InteractionArea
+        icon={<PlayIcon />}
+        title={"Touch here to play or press the 'Space' key."}
+        onTouchStart={play}
+        onTouchEnd={stop}
+        onMouseDown={play}
+        onMouseUp={stop}
+      />
+    </SynthPageLayout>
   );
 }
 
