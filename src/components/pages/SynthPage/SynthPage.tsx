@@ -7,7 +7,7 @@ import {KnobPercentage} from '@/components/ui/KnobPercentage';
 import {KnobAdr} from '@/components/ui/KnobAdr';
 import {KnobFrequency} from '@/components/ui/KnobFrequency';
 import {InteractionArea} from '@/components/ui/InteractionArea';
-import {PlayIcon} from '@/components/icons/PlayIcon';
+import {PlayIcon} from '@/components/icons';
 import {SynthContainer} from './SynthContainer';
 import {SynthPageSkeleton} from './SynthPageSkeleton';
 import {KnobsLayout} from './KnobsLayout';

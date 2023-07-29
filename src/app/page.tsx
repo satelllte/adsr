@@ -1,6 +1,6 @@
 'use client';
 import {Suspense, lazy, useState} from 'react';
-import {PlayIcon} from '@/components/icons/PlayIcon';
+import {PlayIcon} from '@/components/icons';
 import {SynthPageSkeleton} from '@/components/pages/SynthPage';
 
 const SynthPage = lazy(async () => {
