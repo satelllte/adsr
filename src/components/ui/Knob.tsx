@@ -1,8 +1,8 @@
 import {keyCodes} from '@/constants/key-codes';
-import {clamp01, mapFrom01Linear, mapTo01Linear} from '@/utils/math';
+import {clamp, clamp01, mapFrom01Linear, mapTo01Linear} from '@/utils/math';
 import {useDrag} from '@use-gesture/react';
 import clsx from 'clsx';
-import {useId} from 'react';
+import {useEffect, useId, useRef, useState} from 'react';
 
 export type KnobProps = {
   isLarge?: boolean;
@@ -30,6 +30,10 @@ export function Knob({
   mapFrom01 = mapFrom01Linear,
 }: KnobProps) {
   const id = useId();
+
+  const knobContainerRef = useRef<HTMLDivElement>(null);
+
+  const [isNumberInputActive, setIsNumberInputActive] = useState(false);
 
   const value01 = mapTo01(value, min, max);
   const valueText = displayValueFn(value);
@@ -61,6 +65,22 @@ export function Knob({
     if (code === keyCodes.backspace || code === keyCodes.delete) {
       const defaultValue01 = mapTo01(defaultValue, min, max);
       changeValueTo(defaultValue01);
+      return;
+    }
+
+    if (
+      code === keyCodes.digit0 ||
+      code === keyCodes.digit1 ||
+      code === keyCodes.digit2 ||
+      code === keyCodes.digit3 ||
+      code === keyCodes.digit4 ||
+      code === keyCodes.digit5 ||
+      code === keyCodes.digit6 ||
+      code === keyCodes.digit7 ||
+      code === keyCodes.digit8 ||
+      code === keyCodes.digit9
+    ) {
+      setIsNumberInputActive(true);
     }
   };
 
@@ -70,44 +90,120 @@ export function Knob({
   });
 
   return (
-    <div
-      className={clsx(
-        'flex select-none flex-col items-center text-xs outline-none focus:outline-dashed focus:outline-1 focus:outline-gray-4',
-        isLarge ? 'w-20' : 'w-16',
-      )}
-      tabIndex={-1} // Making element focusable by mouse / touch (not Tab). Details: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex
-      onKeyDown={onKeyDown}
-      onPointerDown={(event) => {
-        // Touch devices have a delay before focusing so it won't focus if touch immediately moves away from target (sliding). We want thumb to focus regardless.
-        // See, for reference, Radix UI Slider does the same: https://github.com/radix-ui/primitives/blob/eca6babd188df465f64f23f3584738b85dba610e/packages/react/slider/src/Slider.tsx#L442-L445
-        event.currentTarget.focus();
-      }}
-    >
-      <label htmlFor={id}>{title}</label>
+    <div className='relative text-xs'>
       <div
-        id={id}
+        ref={knobContainerRef}
         className={clsx(
-          'relative touch-none', // It's recommended to disable "touch-action" for use-gesture: https://use-gesture.netlify.app/docs/extras/#touch-action
-          isLarge ? 'h-16 w-16' : 'h-12 w-12',
+          'flex select-none flex-col items-center outline-none focus:outline-dashed focus:outline-1 focus:outline-gray-4',
+          isLarge ? 'w-20' : 'w-16',
         )}
-        role='slider'
-        aria-valuenow={value}
-        aria-valuemin={min}
-        aria-valuemax={max}
-        aria-valuetext={valueText}
-        aria-orientation='vertical'
-        {...bindDrag()}
+        tabIndex={-1} // Making element focusable by mouse / touch (not Tab). Details: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex
+        onKeyDown={onKeyDown}
+        onPointerDown={(event) => {
+          // Touch devices have a delay before focusing so it won't focus if touch immediately moves away from target (sliding). We want thumb to focus regardless.
+          // See, for reference, Radix UI Slider does the same: https://github.com/radix-ui/primitives/blob/eca6babd188df465f64f23f3584738b85dba610e/packages/react/slider/src/Slider.tsx#L442-L445
+          event.currentTarget.focus();
+        }}
       >
-        <div className='absolute h-full w-full rounded-full bg-gray-3'>
-          <div
-            className='absolute h-full w-full'
-            style={{rotate: `${angle}deg`}}
-          >
-            <div className='absolute left-1/2 top-0 h-1/2 w-[2px] -translate-x-1/2 rounded-sm bg-gray-7' />
+        <label htmlFor={id}>{title}</label>
+        <div
+          id={id}
+          className={clsx(
+            'relative touch-none', // It's recommended to disable "touch-action" for use-gesture: https://use-gesture.netlify.app/docs/extras/#touch-action
+            isLarge ? 'h-16 w-16' : 'h-12 w-12',
+          )}
+          role='slider'
+          aria-valuenow={value}
+          aria-valuemin={min}
+          aria-valuemax={max}
+          aria-valuetext={valueText}
+          aria-orientation='vertical'
+          {...bindDrag()}
+        >
+          <div className='absolute h-full w-full rounded-full bg-gray-3'>
+            <div
+              className='absolute h-full w-full'
+              style={{rotate: `${angle}deg`}}
+            >
+              <div className='absolute left-1/2 top-0 h-1/2 w-[2px] -translate-x-1/2 rounded-sm bg-gray-7' />
+            </div>
           </div>
         </div>
+        <label
+          htmlFor={id}
+          onClick={() => {
+            setIsNumberInputActive(true);
+          }}
+        >
+          {valueText}
+        </label>
       </div>
-      <label htmlFor={id}>{valueText}</label>
+      {isNumberInputActive && (
+        <NumberInput
+          onCancel={(reason) => {
+            setIsNumberInputActive(false);
+            if (reason === 'escape') {
+              knobContainerRef.current?.focus(); // Re-focus back on the knob container if the user pressed Escape
+            }
+          }}
+          onSubmit={(newValue) => {
+            setIsNumberInputActive(false);
+            knobContainerRef.current?.focus(); // Re-focus back on the knob container
+
+            onChange(clamp(newValue, min, max));
+          }}
+        />
+      )}
     </div>
+  );
+}
+
+type NumberInputProps = {
+  onCancel: (reason: 'blur' | 'escape') => void;
+  onSubmit: (newValue: number) => void;
+};
+
+function NumberInput({onCancel, onSubmit}: NumberInputProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus(); // Focus on the input when it's mounted
+  }, []);
+
+  return (
+    <form
+      noValidate
+      className='absolute inset-x-0 bottom-0 w-full'
+      onSubmit={(event) => {
+        event.preventDefault(); // Prevent standard form submission behavior
+        const newValue = Number(inputRef.current?.value);
+        onSubmit(newValue);
+      }}
+    >
+      <input
+        ref={inputRef}
+        type='number'
+        className='w-full border border-gray-0 bg-gray-7 text-center text-gray-0 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
+        onBlur={() => {
+          // Cancel on click outside
+          onCancel('blur');
+        }}
+        onKeyDown={(event) => {
+          // Prevent default input behaviour when it's being changed on arrow up/down press
+          if (
+            event.code === keyCodes.arrowDown ||
+            event.code === keyCodes.arrowUp
+          ) {
+            event.preventDefault();
+            return;
+          }
+
+          // Cancel on escape
+          if (event.code === keyCodes.escape) {
+            onCancel('escape');
+          }
+        }}
+      />
+    </form>
   );
 }
