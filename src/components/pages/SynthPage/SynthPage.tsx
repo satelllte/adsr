@@ -141,6 +141,7 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.repeat) {
+        // Skip 2nd+ event if key is being held down already
         return;
       }
 
