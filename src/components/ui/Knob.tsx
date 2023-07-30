@@ -38,13 +38,13 @@ export function Knob({
   const angleMax = 145; // The maximum knob position angle, when x = 1
   const angle = mapFrom01Linear(value01, angleMin, angleMax);
 
-  const changeValueBy = (diff01: number): void => {
-    const newValue01 = clamp01(value01 + diff01);
+  const changeValueTo = (newValue01: number): void => {
     onChange(mapFrom01(newValue01, min, max));
   };
 
-  const changeValueTo = (newValue01: number): void => {
-    onChange(mapFrom01(newValue01, min, max));
+  const changeValueBy = (diff01: number): void => {
+    const newValue01 = clamp01(value01 + diff01);
+    changeValueTo(newValue01);
   };
 
   const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = ({code}) => {
