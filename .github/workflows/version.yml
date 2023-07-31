@@ -1,0 +1,29 @@
+name: Version
+
+env:
+  NODE_VERSION: 18
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to update to (in "X.Y.Z" format)
+        required: true
+        type: string
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        run: npm ci
+      - name: Set version
+        run: npm version ${{ inputs.version }}
+      - name: Push
+        run: git push
