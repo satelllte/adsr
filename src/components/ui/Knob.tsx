@@ -92,8 +92,7 @@ export function Knob({
   };
 
   const changeValue01By = (diff01: number): void => {
-    const newValue01 = clamp01(value01 + diff01);
-    changeValue01To(newValue01);
+    changeValue01To(clamp01(value01 + diff01));
   };
 
   const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = ({code}) => {
