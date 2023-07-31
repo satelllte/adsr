@@ -83,29 +83,33 @@ export function Knob({
   const angleMax = 145; // The maximum knob position angle, when x = 1
   const angle = mapFrom01Linear(value01, angleMin, angleMax);
 
-  const changeValueTo = (newValue01: number): void => {
-    onChange(mapFrom01(newValue01, min, max));
+  const changeValueTo = (newValue: number): void => {
+    onChange(clamp(newValue, min, max));
   };
 
-  const changeValueBy = (diff01: number): void => {
+  const changeValue01To = (newValue01: number): void => {
+    changeValueTo(mapFrom01(newValue01, min, max));
+  };
+
+  const changeValue01By = (diff01: number): void => {
     const newValue01 = clamp01(value01 + diff01);
-    changeValueTo(newValue01);
+    changeValue01To(newValue01);
   };
 
   const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = ({code}) => {
     if (code === keyCodes.arrowLeft || code === keyCodes.arrowDown) {
-      changeValueBy(-0.01);
+      changeValue01By(-0.01);
       return;
     }
 
     if (code === keyCodes.arrowRight || code === keyCodes.arrowUp) {
-      changeValueBy(0.01);
+      changeValue01By(0.01);
       return;
     }
 
     if (code === keyCodes.backspace || code === keyCodes.delete) {
       const defaultValue01 = mapTo01(defaultValue, min, max);
-      changeValueTo(defaultValue01);
+      changeValue01To(defaultValue01);
       return;
     }
 
@@ -127,7 +131,7 @@ export function Knob({
 
   const bindDrag = useDrag(({delta}) => {
     const diff01 = delta[1] * -0.006; // Multiplying by negative sensitivity. Vertical axis (Y) direction of the screen is inverted.
-    changeValueBy(diff01);
+    changeValue01By(diff01);
   });
 
   return (
@@ -185,7 +189,7 @@ export function Knob({
           onCancel={closeManualInput}
           onSubmit={(newValue) => {
             closeManualInput();
-            onChange(clamp(fromManualInputFn(newValue), min, max));
+            changeValueTo(fromManualInputFn(newValue));
           }}
         />
       )}
