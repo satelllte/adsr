@@ -12,9 +12,36 @@ export type KnobProps = {
   min: number;
   max: number;
   onChange: (newValue: number) => void;
+  /**
+   * Used to display the value in the knob.
+   * Example: 1250 Hz can be displayed as "1.25 kHz".
+   */
   displayValueFn: (value: number) => string;
-  mapTo01?: (x: number, min: number, max: number) => number;
+  /**
+   * Used to round/normalize the raw input value.
+   * Example: value of 440.0012 rounds to 440 (Hz).
+   */
+  roundFn?: (x: number) => number;
+  /**
+   * Used to convert the value from the raw manual input to the knob's value.
+   * Example: user enters 50 (%), which is converted to 0.5.
+   */
+  fromManualInputFn?: (x: number) => number;
+  /**
+   * Opposite of `fromManualInputFn`.
+   * Example: 0.5 value should be converted to 50 (%).
+   */
+  toManualInputFn?: (x: number) => number;
+  /**
+   * Used for mapping the knob position to the value.
+   * This is the place for making an interpolation, if non-linear one is required.
+   * Example: logarithmic scale of frequency input, when knob center position 0.5 corresponds to ~ 1 kHz (instead of 10.1 kHz which is the "linear" center of frequency range).
+   */
   mapFrom01?: (x: number, min: number, max: number) => number;
+  /**
+   * Opposite of `mapFrom01`.
+   */
+  mapTo01?: (x: number, min: number, max: number) => number;
 };
 
 export function Knob({
@@ -26,14 +53,32 @@ export function Knob({
   max,
   onChange,
   displayValueFn,
-  mapTo01 = mapTo01Linear,
+  roundFn = (x) => x,
+  fromManualInputFn = (x) => x,
+  toManualInputFn = (x) => x,
   mapFrom01 = mapFrom01Linear,
+  mapTo01 = mapTo01Linear,
 }: KnobProps) {
   const id = useId();
 
   const knobContainerRef = useRef<HTMLDivElement>(null);
 
+  const [hasNumberInputInitialValue, setHasNumberInputInitialValue] =
+    useState(true);
   const [isNumberInputActive, setIsNumberInputActive] = useState(false);
+  const numberInputInitialValue = hasNumberInputInitialValue
+    ? toManualInputFn(value)
+    : undefined;
+
+  const openNumberInput = (withDefaultValue: boolean) => {
+    setHasNumberInputInitialValue(withDefaultValue);
+    setIsNumberInputActive(true);
+  };
+
+  const closeNumberInput = () => {
+    setIsNumberInputActive(false);
+    knobContainerRef.current?.focus(); // Re-focus back on the knob container
+  };
 
   const value01 = mapTo01(value, min, max);
   const valueText = displayValueFn(value);
@@ -43,7 +88,7 @@ export function Knob({
   const angle = mapFrom01Linear(value01, angleMin, angleMax);
 
   const changeValueTo = (newValue01: number): void => {
-    onChange(mapFrom01(newValue01, min, max));
+    onChange(roundFn(mapFrom01(newValue01, min, max)));
   };
 
   const changeValueBy = (diff01: number): void => {
@@ -80,7 +125,7 @@ export function Knob({
       code === keyCodes.digit8 ||
       code === keyCodes.digit9
     ) {
-      setIsNumberInputActive(true);
+      openNumberInput(false);
     }
   };
 
@@ -132,7 +177,7 @@ export function Knob({
         <label
           htmlFor={id}
           onClick={() => {
-            setIsNumberInputActive(true);
+            openNumberInput(true);
           }}
         >
           {valueText}
@@ -140,17 +185,11 @@ export function Knob({
       </div>
       {isNumberInputActive && (
         <NumberInput
-          onCancel={(reason) => {
-            setIsNumberInputActive(false);
-            if (reason === 'escape') {
-              knobContainerRef.current?.focus(); // Re-focus back on the knob container if the user pressed Escape
-            }
-          }}
+          initialValue={numberInputInitialValue}
+          onCancel={closeNumberInput}
           onSubmit={(newValue) => {
-            setIsNumberInputActive(false);
-            knobContainerRef.current?.focus(); // Re-focus back on the knob container
-
-            onChange(clamp(newValue, min, max));
+            closeNumberInput();
+            onChange(roundFn(clamp(fromManualInputFn(newValue), min, max)));
           }}
         />
       )}
@@ -159,16 +198,24 @@ export function Knob({
 }
 
 type NumberInputProps = {
-  onCancel: (reason: 'blur' | 'escape') => void;
+  initialValue?: number;
+  onCancel: () => void;
   onSubmit: (newValue: number) => void;
 };
 
-function NumberInput({onCancel, onSubmit}: NumberInputProps) {
+function NumberInput({initialValue, onCancel, onSubmit}: NumberInputProps) {
+  const isCancelledRef = useRef<boolean>(false);
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     inputRef.current?.focus(); // Focus on the input when it's mounted
   }, []);
+
+  const submit = () => {
+    if (isCancelledRef.current) return;
+    onSubmit(Number(inputRef.current?.value));
+  };
 
   return (
     <form
@@ -176,20 +223,17 @@ function NumberInput({onCancel, onSubmit}: NumberInputProps) {
       className='absolute inset-x-0 bottom-0 w-full'
       onSubmit={(event) => {
         event.preventDefault(); // Prevent standard form submission behavior
-        const newValue = Number(inputRef.current?.value);
-        onSubmit(newValue);
+        submit();
       }}
     >
       <input
         ref={inputRef}
+        defaultValue={initialValue}
         type='number'
         className='w-full border border-gray-0 bg-gray-7 text-center text-gray-0 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
-        onBlur={() => {
-          // Cancel on click outside
-          onCancel('blur');
-        }}
+        onBlur={submit}
         onKeyDown={(event) => {
-          // Prevent default input behaviour when it's being changed on arrow up/down press
+          // Prevent standard input behaviour when it's being changed on arrow up/down press
           if (
             event.code === keyCodes.arrowDown ||
             event.code === keyCodes.arrowUp
@@ -200,7 +244,8 @@ function NumberInput({onCancel, onSubmit}: NumberInputProps) {
 
           // Cancel on escape
           if (event.code === keyCodes.escape) {
-            onCancel('escape');
+            isCancelledRef.current = true;
+            onCancel();
           }
         }}
       />
