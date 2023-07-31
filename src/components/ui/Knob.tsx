@@ -59,20 +59,20 @@ export function Knob({
 
   const knobContainerRef = useRef<HTMLDivElement>(null);
 
-  const [hasNumberInputInitialValue, setHasNumberInputInitialValue] =
+  const [hasManualInputInitialValue, setHasManualInputInitialValue] =
     useState(true);
-  const [isNumberInputActive, setIsNumberInputActive] = useState(false);
-  const numberInputInitialValue = hasNumberInputInitialValue
+  const [isManualInputActive, setIsManualInputActive] = useState(false);
+  const manualInputInitialValue = hasManualInputInitialValue
     ? toManualInputFn(value)
     : undefined;
 
-  const openNumberInput = (withDefaultValue: boolean) => {
-    setHasNumberInputInitialValue(withDefaultValue);
-    setIsNumberInputActive(true);
+  const openManualInput = (withDefaultValue: boolean) => {
+    setHasManualInputInitialValue(withDefaultValue);
+    setIsManualInputActive(true);
   };
 
-  const closeNumberInput = () => {
-    setIsNumberInputActive(false);
+  const closeManualInput = () => {
+    setIsManualInputActive(false);
     knobContainerRef.current?.focus(); // Re-focus back on the knob container
   };
 
@@ -121,7 +121,7 @@ export function Knob({
       code === keyCodes.digit8 ||
       code === keyCodes.digit9
     ) {
-      openNumberInput(false);
+      openManualInput(false);
     }
   };
 
@@ -173,18 +173,18 @@ export function Knob({
         <label
           htmlFor={id}
           onClick={() => {
-            openNumberInput(true);
+            openManualInput(true);
           }}
         >
           {valueText}
         </label>
       </div>
-      {isNumberInputActive && (
-        <NumberInput
-          initialValue={numberInputInitialValue}
-          onCancel={closeNumberInput}
+      {isManualInputActive && (
+        <ManualInput
+          initialValue={manualInputInitialValue}
+          onCancel={closeManualInput}
           onSubmit={(newValue) => {
-            closeNumberInput();
+            closeManualInput();
             onChange(clamp(fromManualInputFn(newValue), min, max));
           }}
         />
@@ -193,20 +193,19 @@ export function Knob({
   );
 }
 
-type NumberInputProps = {
+type ManualInputProps = {
   initialValue?: number;
   onCancel: () => void;
   onSubmit: (newValue: number) => void;
 };
 
-function NumberInput({initialValue, onCancel, onSubmit}: NumberInputProps) {
-  const isCancelledRef = useRef<boolean>(false);
-
+function ManualInput({initialValue, onCancel, onSubmit}: ManualInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-
   useEffect(() => {
     inputRef.current?.focus(); // Focus on the input when it's mounted
   }, []);
+
+  const isCancelledRef = useRef<boolean>(false);
 
   const submit = () => {
     if (isCancelledRef.current) return;
