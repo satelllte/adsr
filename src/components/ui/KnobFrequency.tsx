@@ -7,9 +7,8 @@ export type KnobFrequencyProps = Omit<
   | 'min'
   | 'max'
   | 'displayValueFn'
-  | 'roundFn'
-  | 'fromManualInputFn'
   | 'toManualInputFn'
+  | 'fromManualInputFn'
   | 'mapTo01'
   | 'mapFrom01'
 >;
@@ -27,7 +26,8 @@ export function KnobFrequency(props: KnobFrequencyProps) {
       min={min}
       max={max}
       displayValueFn={displayValueFn}
-      roundFn={roundFn}
+      toManualInputFn={toManualInputFn}
+      fromManualInputFn={fromManualInputFn}
       mapTo01={mapTo01}
       mapFrom01={mapFrom01}
       {...props}
@@ -53,7 +53,7 @@ const displayValueFn = (hz: number) => {
   return `${kHz.toFixed(1)} kHz`;
 };
 
-const roundFn = (hz: number): number => {
+const toManualInputFn = (hz: number): number => {
   if (hz < 100) {
     return round(hz, 1);
   }
@@ -68,3 +68,5 @@ const roundFn = (hz: number): number => {
 
   return round(hz, -2);
 };
+
+const fromManualInputFn = (hz: number): number => hz;

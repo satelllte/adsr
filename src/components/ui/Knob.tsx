@@ -14,34 +14,31 @@ export type KnobProps = {
   onChange: (newValue: number) => void;
   /**
    * Used to display the value in the knob.
-   * Example: 1250 Hz can be displayed as "1.25 kHz".
+   * Note, that rounding must be applied here either, so raw slider values with lots of decimals will be handled properly.
+   * Example: 1250.11011 Hz can be displayed as "1.25 kHz".
    */
   displayValueFn: (value: number) => string;
   /**
-   * Used to round/normalize the raw input value.
-   * Example: value of 440.0012 rounds to 440 (Hz).
-   */
-  roundFn?: (x: number) => number;
-  /**
    * Used to convert the value from the raw manual input to the knob's value.
+   * Note, that rounding must be applied here either, so raw slider values with lots of decimals will be handled properly.
+   * Example: 0.500001 value should be converted to 50 (%).
+   */
+  toManualInputFn: (x: number) => number;
+  /**
+   * Opposite of `toManualInputFn`.
    * Example: user enters 50 (%), which is converted to 0.5.
    */
-  fromManualInputFn?: (x: number) => number;
+  fromManualInputFn: (x: number) => number;
   /**
-   * Opposite of `fromManualInputFn`.
-   * Example: 0.5 value should be converted to 50 (%).
-   */
-  toManualInputFn?: (x: number) => number;
-  /**
-   * Used for mapping the knob position to the value.
-   * This is the place for making an interpolation, if non-linear one is required.
+   * Used for mapping the value to the knob position (number from 0 to 1).
+   * This is the place for making the interpolation, if non-linear one is required.
    * Example: logarithmic scale of frequency input, when knob center position 0.5 corresponds to ~ 1 kHz (instead of 10.1 kHz which is the "linear" center of frequency range).
    */
-  mapFrom01?: (x: number, min: number, max: number) => number;
-  /**
-   * Opposite of `mapFrom01`.
-   */
   mapTo01?: (x: number, min: number, max: number) => number;
+  /**
+   * Opposite of `mapTo01`.
+   */
+  mapFrom01?: (x: number, min: number, max: number) => number;
 };
 
 export function Knob({
@@ -53,11 +50,10 @@ export function Knob({
   max,
   onChange,
   displayValueFn,
-  roundFn = (x) => x,
-  fromManualInputFn = (x) => x,
   toManualInputFn = (x) => x,
-  mapFrom01 = mapFrom01Linear,
+  fromManualInputFn = (x) => x,
   mapTo01 = mapTo01Linear,
+  mapFrom01 = mapFrom01Linear,
 }: KnobProps) {
   const id = useId();
 
@@ -88,7 +84,7 @@ export function Knob({
   const angle = mapFrom01Linear(value01, angleMin, angleMax);
 
   const changeValueTo = (newValue01: number): void => {
-    onChange(roundFn(mapFrom01(newValue01, min, max)));
+    onChange(mapFrom01(newValue01, min, max));
   };
 
   const changeValueBy = (diff01: number): void => {
@@ -189,7 +185,7 @@ export function Knob({
           onCancel={closeNumberInput}
           onSubmit={(newValue) => {
             closeNumberInput();
-            onChange(roundFn(clamp(fromManualInputFn(newValue), min, max)));
+            onChange(clamp(fromManualInputFn(newValue), min, max));
           }}
         />
       )}

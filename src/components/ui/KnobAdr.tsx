@@ -7,9 +7,8 @@ export type KnobAdrProps = Omit<
   | 'min'
   | 'max'
   | 'displayValueFn'
-  | 'roundFn'
-  | 'fromManualInputFn'
   | 'toManualInputFn'
+  | 'fromManualInputFn'
   | 'mapTo01'
   | 'mapFrom01'
 >;
@@ -27,8 +26,8 @@ export function KnobAdr(props: KnobAdrProps) {
       min={min}
       max={max}
       displayValueFn={displayValueFn}
-      fromManualInputFn={fromManualInputFn}
       toManualInputFn={toManualInputFn}
+      fromManualInputFn={fromManualInputFn}
       mapTo01={mapTo01}
       mapFrom01={mapFrom01}
       {...props}
@@ -58,8 +57,6 @@ const displayValueFn = (s: number) => {
   return `${s.toFixed(1)} s`;
 };
 
-const fromManualInputFn = (ms: number): number => ms / 1000;
-
 const toManualInputFn = (s: number): number => {
   const ms = s * 1000;
 
@@ -81,3 +78,5 @@ const toManualInputFn = (s: number): number => {
 
   return round(ms, -2);
 };
+
+const fromManualInputFn = (ms: number): number => ms / 1000;
