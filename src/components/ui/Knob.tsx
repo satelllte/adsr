@@ -1,4 +1,5 @@
 import {keyCodes} from '@/constants/key-codes';
+import {isNumberKey} from '@/utils/keyboard';
 import {clamp, clamp01, mapFrom01Linear, mapTo01Linear} from '@/utils/math';
 import {useDrag} from '@use-gesture/react';
 import clsx from 'clsx';
@@ -95,7 +96,9 @@ export function Knob({
     changeValue01To(clamp01(value01 + diff01));
   };
 
-  const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = ({code}) => {
+  const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
+    const {code, key} = event;
+
     if (code === keyCodes.arrowLeft || code === keyCodes.arrowDown) {
       changeValue01By(-0.01);
       return;
@@ -112,18 +115,7 @@ export function Knob({
       return;
     }
 
-    if (
-      code === keyCodes.digit0 ||
-      code === keyCodes.digit1 ||
-      code === keyCodes.digit2 ||
-      code === keyCodes.digit3 ||
-      code === keyCodes.digit4 ||
-      code === keyCodes.digit5 ||
-      code === keyCodes.digit6 ||
-      code === keyCodes.digit7 ||
-      code === keyCodes.digit8 ||
-      code === keyCodes.digit9
-    ) {
+    if (isNumberKey(key)) {
       openManualInput(false);
     }
   };
