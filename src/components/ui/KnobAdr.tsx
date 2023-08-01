@@ -1,10 +1,16 @@
 import {Knob, type KnobProps} from './Knob';
-import {NormalisableRange} from '@/utils/math';
+import {NormalisableRange, round} from '@/utils/math';
 import {useConst} from '@/components/hooks/useConst';
 
 export type KnobAdrProps = Omit<
   KnobProps,
-  'min' | 'max' | 'displayValueFn' | 'mapTo01' | 'mapFrom01'
+  | 'min'
+  | 'max'
+  | 'displayValueFn'
+  | 'toManualInputFn'
+  | 'fromManualInputFn'
+  | 'mapTo01'
+  | 'mapFrom01'
 >;
 
 export function KnobAdr(props: KnobAdrProps) {
@@ -20,6 +26,8 @@ export function KnobAdr(props: KnobAdrProps) {
       min={min}
       max={max}
       displayValueFn={displayValueFn}
+      toManualInputFn={toManualInputFn}
+      fromManualInputFn={fromManualInputFn}
       mapTo01={mapTo01}
       mapFrom01={mapFrom01}
       {...props}
@@ -48,3 +56,27 @@ const displayValueFn = (s: number) => {
 
   return `${s.toFixed(1)} s`;
 };
+
+const toManualInputFn = (s: number): number => {
+  const ms = s * 1000;
+
+  if (ms < 10) {
+    return round(ms, 2);
+  }
+
+  if (ms < 100) {
+    return round(ms, 1);
+  }
+
+  if (ms < 1000) {
+    return round(ms);
+  }
+
+  if (ms < 10000) {
+    return round(ms, -1);
+  }
+
+  return round(ms, -2);
+};
+
+const fromManualInputFn = (ms: number): number => ms / 1000;

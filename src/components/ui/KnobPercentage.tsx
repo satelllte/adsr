@@ -3,14 +3,36 @@ import {Knob, type KnobProps} from './Knob';
 
 export type KnobPercentageProps = Omit<
   KnobProps,
-  'min' | 'max' | 'displayValueFn' | 'mapTo01' | 'mapFrom01'
+  | 'min'
+  | 'max'
+  | 'displayValueFn'
+  | 'toManualInputFn'
+  | 'fromManualInputFn'
+  | 'mapTo01'
+  | 'mapFrom01'
 >;
 
 export function KnobPercentage(props: KnobPercentageProps) {
-  return <Knob min={0} max={1} displayValueFn={displayValueFn} {...props} />;
+  return (
+    <Knob
+      min={0}
+      max={1}
+      displayValueFn={displayValueFn}
+      toManualInputFn={toManualInputFn}
+      fromManualInputFn={fromManualInputFn}
+      {...props}
+    />
+  );
 }
 
 const displayValueFn = (value: number) => {
-  const v = round(value * 100, 1);
-  return `${v < 10 ? v.toFixed(1) : v.toFixed(0)} %`;
+  const percent = round(value * 100, 1);
+  return `${percent < 10 ? percent.toFixed(1) : percent.toFixed(0)} %`;
 };
+
+const toManualInputFn = (value: number): number => {
+  const percent = value * 100;
+  return percent < 10 ? round(percent, 1) : round(percent);
+};
+
+const fromManualInputFn = (percent: number): number => percent / 100;

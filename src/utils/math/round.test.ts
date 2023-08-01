@@ -9,6 +9,13 @@ describe('round', () => {
     expect(round(100.9999, 0)).toBe(101);
   });
 
+  it('should round the value to the specified negative precision', () => {
+    expect(round(3141, -1)).toBe(3140);
+    expect(round(3141, -2)).toBe(3100);
+    expect(round(3141, -3)).toBe(3000);
+    expect(round(3741, -3)).toBe(4000);
+  });
+
   it('should round the value to the nearest integer when no precision is specified', () => {
     expect(round(3.14159)).toBe(3);
     expect(round(5.6789)).toBe(6);
