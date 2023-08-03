@@ -1,5 +1,5 @@
 extends:
-  - next/core-web-vitals
+  - plugin:@next/next/core-web-vitals
   - xo
   - xo-typescript
   - xo-react
