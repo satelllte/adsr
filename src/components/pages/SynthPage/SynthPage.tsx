@@ -130,15 +130,31 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
       return;
     }
 
-    ctx.fillStyle = '#01da48';
+    let rafHandle: number | undefined;
+    let volume = 0;
 
-    core.on('meter', ({max}: MeterEvent) => {
+    ctx.fillStyle = '#01da48';
+    const drawMeter = () => {
       const {width, height} = canvas;
       ctx.clearRect(0, 0, width, height);
 
-      const meterHeight = height * max;
+      const meterHeight = height * volume;
       ctx.fillRect(0, height - meterHeight, width, meterHeight);
+
+      rafHandle = requestAnimationFrame(drawMeter);
+    };
+
+    core.on('meter', ({max}: MeterEvent) => {
+      volume = max;
     });
+
+    rafHandle = requestAnimationFrame(drawMeter);
+
+    return () => {
+      if (rafHandle) {
+        cancelAnimationFrame(rafHandle);
+      }
+    };
   }, [core]);
 
   const renderAudio = useCallback(async () => {
