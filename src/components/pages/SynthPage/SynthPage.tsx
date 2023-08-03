@@ -111,6 +111,33 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
     el.const({key: releaseKey, value: releaseDefault}),
   );
 
+  const meterCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    type MeterEvent = {
+      source: string;
+      min: number;
+      max: number;
+    };
+
+    const canvas = meterCanvasRef.current;
+    if (!canvas) {
+      return;
+    }
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      return;
+    }
+
+    ctx.fillStyle = '#01da48';
+
+    core.on('meter', ({min, max}: MeterEvent) => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillRect(0, 0, canvas.width, canvas.height * max);
+    });
+  }, [core]);
+
   const renderAudio = useCallback(async () => {
     if (ctx.state !== 'running') {
       await ctx.resume();
@@ -124,7 +151,7 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
     const release = releaseRef.current;
     const envelope = el.adsr(attack, decay, sustain, release, gate);
     const sine = el.cycle(freq);
-    const out = el.mul(envelope, sine);
+    const out = el.meter({name: 'meter'}, el.mul(envelope, sine));
     core.render(out, out);
   }, [ctx, core]);
 
@@ -211,6 +238,7 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
             onChange={renderAudio}
           />
         </KnobsLayout>
+        <canvas ref={meterCanvasRef} width={8} height={150} />
       </SynthContainer>
       <InteractionArea
         icon={<PlayIcon />}
