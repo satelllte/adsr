@@ -115,7 +115,7 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
 
   useEffect(() => {
     type MeterEvent = {
-      source: string;
+      source?: string;
       min: number;
       max: number;
     };
