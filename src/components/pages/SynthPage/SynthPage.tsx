@@ -132,9 +132,12 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
 
     ctx.fillStyle = '#01da48';
 
-    core.on('meter', ({min, max}: MeterEvent) => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillRect(0, 0, canvas.width, canvas.height * max);
+    core.on('meter', ({max}: MeterEvent) => {
+      const {width, height} = canvas;
+      ctx.clearRect(0, 0, width, height);
+
+      const meterHeight = height * max;
+      ctx.fillRect(0, height - meterHeight, width, meterHeight);
     });
   }, [core]);
 
