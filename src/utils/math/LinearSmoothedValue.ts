@@ -1,3 +1,10 @@
+/**
+ * A class that smoothly interpolates between two values over time using High precision timing API:
+ * https://developer.mozilla.org/en-US/docs/Web/API/Performance_API/High_precision_timing
+ *
+ * The implementation is very similar to LinearSmoothedValue from JUCE:
+ * https://github.com/juce-framework/JUCE/blob/master/modules/juce_audio_basics/utilities/juce_SmoothedValue.h
+ */
 export class LinearSmoothedValue {
   private _currentValue: number;
   private _targetValue: number;
