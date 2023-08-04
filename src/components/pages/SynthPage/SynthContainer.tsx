@@ -28,7 +28,7 @@ export function SynthContainer({
       </div>
       <div className='flex'>
         <div className='p-2 sm:p-3'>{children}</div>
-        <div className='flex w-4 gap-0.5'>
+        <div className='flex w-3 gap-0.5'>
           <div className='relative flex-1'>
             <canvas ref={meterLeftRef} className='h-full w-full bg-gray-3' />
           </div>
