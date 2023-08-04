@@ -118,67 +118,14 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
     el.const({key: releaseKey, value: releaseDefault}),
   );
 
+  const meterLeftSource = 'meter:left';
+  const meterRightSource = 'meter:right';
+
   const meterLeftRef = useRef<HTMLCanvasElement>(null);
   const meterRightRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    const canvas = meterLeftRef.current;
-    if (!canvas) {
-      return;
-    }
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      return;
-    }
-
-    const volumeDbMin = dbMin;
-    const volumeDbMax = 6;
-    const volumeDb = new LinearSmoothedValue(volumeDbMin, volumeDbMin, 0.5);
-
-    type MeterEvent = {
-      source?: string;
-      min: number;
-      max: number;
-    };
-
-    core.on('meter', ({min, max}: MeterEvent) => {
-      const gain = Math.max(Math.abs(min), Math.abs(max));
-      const db = clamp(gainToDecibels(gain), volumeDbMin, volumeDbMax);
-      if (volumeDb.getCurrentValue() < db) {
-        volumeDb.setCurrentAndTargetValue(db);
-      } else {
-        volumeDb.setTargetValue(db);
-      }
-    });
-
-    let rafHandle: number | undefined;
-
-    ctx.fillStyle = '#01da48';
-
-    const drawMeter = () => {
-      const {width, height} = canvas;
-      ctx.clearRect(0, 0, width, height);
-
-      const volume01 = mapTo01Linear(
-        clamp(volumeDb.getCurrentValue(), volumeDbMin, volumeDbMax),
-        volumeDbMin,
-        volumeDbMax,
-      );
-      const meterHeight = height * volume01;
-      ctx.fillRect(0, height - meterHeight, width, meterHeight);
-
-      rafHandle = requestAnimationFrame(drawMeter);
-    };
-
-    rafHandle = requestAnimationFrame(drawMeter);
-
-    return () => {
-      if (rafHandle) {
-        cancelAnimationFrame(rafHandle);
-      }
-    };
-  }, [core]);
+  useMeter({core, meterRef: meterLeftRef, source: meterLeftSource});
+  useMeter({core, meterRef: meterRightRef, source: meterRightSource});
 
   const renderAudio = useCallback(async () => {
     if (ctx.state !== 'running') {
@@ -193,8 +140,11 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
     const release = releaseRef.current;
     const envelope = el.adsr(attack, decay, sustain, release, gate);
     const sine = el.cycle(freq);
-    const out = el.meter({name: 'meter'}, el.mul(envelope, sine));
-    core.render(out, out);
+    const out = el.mul(envelope, sine);
+    core.render(
+      el.meter({name: meterLeftSource}, out),
+      el.meter({name: meterRightSource}, out),
+    );
   }, [ctx, core]);
 
   const play = useCallback(() => {
@@ -345,4 +295,78 @@ const resolveKnobComponent = (kind: KnobInputKind) => {
     default:
       throw new Error('Unknown knob kind', kind);
   }
+};
+
+const useMeter = ({
+  core,
+  meterRef,
+  source,
+}: {
+  core: WebAudioRenderer;
+  meterRef: React.RefObject<HTMLCanvasElement>;
+  source: string;
+}) => {
+  useEffect(() => {
+    const canvas = meterRef.current;
+    if (!canvas) {
+      return;
+    }
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      return;
+    }
+
+    const volumeDbMin = dbMin;
+    const volumeDbMax = 0;
+    const volumeDb = new LinearSmoothedValue(volumeDbMin, volumeDbMin, 0.5);
+
+    type MeterEvent = {
+      source?: string;
+      min: number;
+      max: number;
+    };
+
+    core.on('meter', (event: MeterEvent) => {
+      if (event.source !== source) {
+        return;
+      }
+
+      const {min, max} = event;
+      const gain = Math.max(Math.abs(min), Math.abs(max));
+      const db = clamp(gainToDecibels(gain), volumeDbMin, volumeDbMax);
+      if (volumeDb.getCurrentValue() < db) {
+        volumeDb.setCurrentAndTargetValue(db);
+      } else {
+        volumeDb.setTargetValue(db);
+      }
+    });
+
+    let rafHandle: number | undefined;
+
+    ctx.fillStyle = '#01da48';
+
+    const drawMeter = () => {
+      const {width, height} = canvas;
+      ctx.clearRect(0, 0, width, height);
+
+      const volume01 = mapTo01Linear(
+        clamp(volumeDb.getCurrentValue(), volumeDbMin, volumeDbMax),
+        volumeDbMin,
+        volumeDbMax,
+      );
+      const meterHeight = height * volume01;
+      ctx.fillRect(0, height - meterHeight, width, meterHeight);
+
+      rafHandle = requestAnimationFrame(drawMeter);
+    };
+
+    rafHandle = requestAnimationFrame(drawMeter);
+
+    return () => {
+      if (rafHandle) {
+        cancelAnimationFrame(rafHandle);
+      }
+    };
+  }, [core, meterRef, source]);
 };
