@@ -2,6 +2,13 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import WebAudioRenderer from '@elemaudio/web-renderer';
 import {el, type NodeRepr_t} from '@elemaudio/core';
+import {
+  LinearSmoothedValue,
+  clamp,
+  dbMin,
+  gainToDecibels,
+  mapTo01Linear,
+} from '@/utils/math';
 import {keyCodes} from '@/constants/key-codes';
 import {KnobPercentage} from '@/components/ui/KnobPercentage';
 import {KnobAdr} from '@/components/ui/KnobAdr';
@@ -114,12 +121,6 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
   const meterCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    type MeterEvent = {
-      source?: string;
-      min: number;
-      max: number;
-    };
-
     const canvas = meterCanvasRef.current;
     if (!canvas) {
       return;
@@ -130,23 +131,44 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
       return;
     }
 
+    const volumeDbMin = dbMin;
+    const volumeDbMax = 6;
+    const volumeDb = new LinearSmoothedValue(volumeDbMin, volumeDbMin, 0.5);
+
+    type MeterEvent = {
+      source?: string;
+      min: number;
+      max: number;
+    };
+
+    core.on('meter', ({min, max}: MeterEvent) => {
+      const gain = Math.max(Math.abs(min), Math.abs(max));
+      const db = clamp(gainToDecibels(gain), volumeDbMin, volumeDbMax);
+      if (volumeDb.getCurrentValue() < db) {
+        volumeDb.setCurrentAndTargetValue(db);
+      } else {
+        volumeDb.setTargetValue(db);
+      }
+    });
+
     let rafHandle: number | undefined;
-    let volume = 0;
 
     ctx.fillStyle = '#01da48';
+
     const drawMeter = () => {
       const {width, height} = canvas;
       ctx.clearRect(0, 0, width, height);
 
-      const meterHeight = height * volume;
+      const volume01 = mapTo01Linear(
+        clamp(volumeDb.getCurrentValue(), volumeDbMin, volumeDbMax),
+        volumeDbMin,
+        volumeDbMax,
+      );
+      const meterHeight = height * volume01;
       ctx.fillRect(0, height - meterHeight, width, meterHeight);
 
       rafHandle = requestAnimationFrame(drawMeter);
     };
-
-    core.on('meter', ({max}: MeterEvent) => {
-      volume = max;
-    });
 
     rafHandle = requestAnimationFrame(drawMeter);
 
