@@ -320,7 +320,7 @@ const useMeter = ({
 
     const volumeDbMin = dbMin;
     const volumeDbMax = 0;
-    const volumeDb = new LinearSmoothedValue(volumeDbMin, volumeDbMin, 0.5);
+    const volumeDb = new LinearSmoothedValue(volumeDbMin, volumeDbMin, 0.3);
 
     type MeterEvent = {
       source?: string;
