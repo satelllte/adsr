@@ -15,5 +15,6 @@ describe('gainToDecibels', () => {
     expect(gainToDecibels(0.0078125)).toBeCloseTo(-42.14);
     expect(gainToDecibels(0.00390625)).toBeCloseTo(-48.16);
     expect(gainToDecibels(0.001953125)).toBeCloseTo(-54.185);
+    expect(gainToDecibels(0)).toBeCloseTo(-Infinity);
   });
 });
