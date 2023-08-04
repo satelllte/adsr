@@ -10,6 +10,7 @@ import {
   mapTo01Linear,
 } from '@/utils/math';
 import {keyCodes} from '@/constants/key-codes';
+import {Meter} from '@/components/ui/Meter';
 import {KnobPercentage} from '@/components/ui/KnobPercentage';
 import {KnobAdr} from '@/components/ui/KnobAdr';
 import {KnobFrequency} from '@/components/ui/KnobFrequency';
@@ -189,8 +190,8 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
       <SynthContainer
         isActivated
         title={title}
-        meterLeftRef={meterLeftRef}
-        meterRightRef={meterRightRef}
+        meterLeft={<Meter ref={meterLeftRef} />}
+        meterRight={<Meter ref={meterRightRef} />}
       >
         <KnobsLayout>
           <KnobInput

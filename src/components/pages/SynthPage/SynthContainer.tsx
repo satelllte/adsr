@@ -4,16 +4,16 @@ type SynthContainerProps = {
   isActivated?: boolean;
   title: string;
   children: React.ReactNode;
-  meterLeftRef: React.RefObject<HTMLCanvasElement>;
-  meterRightRef: React.RefObject<HTMLCanvasElement>;
+  meterLeft: React.ReactNode;
+  meterRight: React.ReactNode;
 };
 
 export function SynthContainer({
   isActivated = false,
   title,
   children,
-  meterLeftRef,
-  meterRightRef,
+  meterLeft,
+  meterRight,
 }: SynthContainerProps) {
   return (
     <div className='bg-gray-2'>
@@ -29,12 +29,8 @@ export function SynthContainer({
       <div className='flex'>
         <div className='p-2 sm:p-3'>{children}</div>
         <div className='flex w-3 gap-0.5'>
-          <div className='relative flex-1'>
-            <canvas ref={meterLeftRef} className='h-full w-full bg-gray-3' />
-          </div>
-          <div className='relative flex-1'>
-            <canvas ref={meterRightRef} className='h-full w-full bg-gray-3' />
-          </div>
+          <div className='relative flex-1'>{meterLeft}</div>
+          <div className='relative flex-1'>{meterRight}</div>
         </div>
       </div>
     </div>
