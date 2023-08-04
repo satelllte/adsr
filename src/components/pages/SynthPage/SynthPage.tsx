@@ -2,6 +2,8 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import WebAudioRenderer from '@elemaudio/web-renderer';
 import {el, type NodeRepr_t} from '@elemaudio/core';
+import resolveConfig from 'tailwindcss/resolveConfig';
+import tailwindConfig from '@/../tailwind.config';
 import {
   LinearSmoothedValue,
   clamp,
@@ -21,6 +23,8 @@ import {SynthPageSkeleton} from './SynthPageSkeleton';
 import {KnobsLayout} from './KnobsLayout';
 import {title} from './constants';
 import {SynthPageLayout} from './SynthPageLayout';
+
+const {colors} = resolveConfig(tailwindConfig).theme;
 
 export function SynthPage() {
   const [isReady, setIsReady] = useState<boolean>(false);
@@ -345,7 +349,7 @@ const useMeter = ({
 
     let rafHandle: number | undefined;
 
-    ctx.fillStyle = '#01da48';
+    ctx.fillStyle = colors.green;
 
     const drawMeter = () => {
       const {width, height} = canvas;
