@@ -118,10 +118,11 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
     el.const({key: releaseKey, value: releaseDefault}),
   );
 
-  const meterCanvasRef = useRef<HTMLCanvasElement>(null);
+  const meterLeftRef = useRef<HTMLCanvasElement>(null);
+  const meterRightRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = meterCanvasRef.current;
+    const canvas = meterLeftRef.current;
     if (!canvas) {
       return;
     }
@@ -235,7 +236,12 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
 
   return (
     <SynthPageLayout>
-      <SynthContainer isActivated title={title}>
+      <SynthContainer
+        isActivated
+        title={title}
+        meterLeftRef={meterLeftRef}
+        meterRightRef={meterRightRef}
+      >
         <KnobsLayout>
           <KnobInput
             isLarge
@@ -279,7 +285,6 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
             onChange={renderAudio}
           />
         </KnobsLayout>
-        <canvas ref={meterCanvasRef} width={8} height={150} />
       </SynthContainer>
       <InteractionArea
         icon={<PlayIcon />}
