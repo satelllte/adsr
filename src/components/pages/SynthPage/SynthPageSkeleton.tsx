@@ -4,11 +4,16 @@ import {SynthPageLayout} from './SynthPageLayout';
 import {SynthContainer} from './SynthContainer';
 import {KnobsLayout} from './KnobsLayout';
 import {title} from './constants';
+import {MeterSkeleton} from '@/components/ui/Meter';
 
 export function SynthPageSkeleton() {
   return (
     <SynthPageLayout>
-      <SynthContainer title={title}>
+      <SynthContainer
+        title={title}
+        meterLeft={<MeterSkeleton />}
+        meterRight={<MeterSkeleton />}
+      >
         <KnobsLayout>
           <KnobSkeleton isLarge />
           <KnobSkeleton />

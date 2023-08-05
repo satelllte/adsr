@@ -2,7 +2,17 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import WebAudioRenderer from '@elemaudio/web-renderer';
 import {el, type NodeRepr_t} from '@elemaudio/core';
+import resolveConfig from 'tailwindcss/resolveConfig';
+import tailwindConfig from '@/../tailwind.config';
+import {
+  LinearSmoothedValue,
+  clamp,
+  dbMin,
+  gainToDecibels,
+  mapTo01Linear,
+} from '@/utils/math';
 import {keyCodes} from '@/constants/key-codes';
+import {Meter} from '@/components/ui/Meter';
 import {KnobPercentage} from '@/components/ui/KnobPercentage';
 import {KnobAdr} from '@/components/ui/KnobAdr';
 import {KnobFrequency} from '@/components/ui/KnobFrequency';
@@ -13,6 +23,8 @@ import {SynthPageSkeleton} from './SynthPageSkeleton';
 import {KnobsLayout} from './KnobsLayout';
 import {title} from './constants';
 import {SynthPageLayout} from './SynthPageLayout';
+
+const {colors} = resolveConfig(tailwindConfig).theme;
 
 export function SynthPage() {
   const [isReady, setIsReady] = useState<boolean>(false);
@@ -111,6 +123,15 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
     el.const({key: releaseKey, value: releaseDefault}),
   );
 
+  const meterLeftSource = 'meter:left';
+  const meterRightSource = 'meter:right';
+
+  const meterLeftRef = useRef<HTMLCanvasElement>(null);
+  const meterRightRef = useRef<HTMLCanvasElement>(null);
+
+  useMeter({core, meterRef: meterLeftRef, source: meterLeftSource});
+  useMeter({core, meterRef: meterRightRef, source: meterRightSource});
+
   const renderAudio = useCallback(async () => {
     if (ctx.state !== 'running') {
       await ctx.resume();
@@ -125,7 +146,10 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
     const envelope = el.adsr(attack, decay, sustain, release, gate);
     const sine = el.cycle(freq);
     const out = el.mul(envelope, sine);
-    core.render(out, out);
+    core.render(
+      el.meter({name: meterLeftSource}, out),
+      el.meter({name: meterRightSource}, out),
+    );
   }, [ctx, core]);
 
   const play = useCallback(() => {
@@ -167,7 +191,12 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
 
   return (
     <SynthPageLayout>
-      <SynthContainer isActivated title={title}>
+      <SynthContainer
+        isActivated
+        title={title}
+        meterLeft={<Meter ref={meterLeftRef} />}
+        meterRight={<Meter ref={meterRightRef} />}
+      >
         <KnobsLayout>
           <KnobInput
             isLarge
@@ -271,4 +300,78 @@ const resolveKnobComponent = (kind: KnobInputKind) => {
     default:
       throw new Error('Unknown knob kind', kind);
   }
+};
+
+const useMeter = ({
+  core,
+  meterRef,
+  source,
+}: {
+  core: WebAudioRenderer;
+  meterRef: React.RefObject<HTMLCanvasElement>;
+  source: string;
+}) => {
+  useEffect(() => {
+    const canvas = meterRef.current;
+    if (!canvas) {
+      return;
+    }
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      return;
+    }
+
+    const volumeDbMin = dbMin;
+    const volumeDbMax = 0;
+    const volumeDb = new LinearSmoothedValue(volumeDbMin, volumeDbMin, 0.3);
+
+    type MeterEvent = {
+      source?: string;
+      min: number;
+      max: number;
+    };
+
+    core.on('meter', (event: MeterEvent) => {
+      if (event.source !== source) {
+        return;
+      }
+
+      const {min, max} = event;
+      const gain = Math.max(Math.abs(min), Math.abs(max));
+      const db = clamp(gainToDecibels(gain), volumeDbMin, volumeDbMax);
+      if (volumeDb.getCurrentValue() < db) {
+        volumeDb.setCurrentAndTargetValue(db);
+      } else {
+        volumeDb.setTargetValue(db);
+      }
+    });
+
+    let rafHandle: number | undefined;
+
+    ctx.fillStyle = colors.green;
+
+    const drawMeter = () => {
+      const {width, height} = canvas;
+      ctx.clearRect(0, 0, width, height);
+
+      const volume01 = mapTo01Linear(
+        clamp(volumeDb.getCurrentValue(), volumeDbMin, volumeDbMax),
+        volumeDbMin,
+        volumeDbMax,
+      );
+      const meterHeight = height * volume01;
+      ctx.fillRect(0, height - meterHeight, width, meterHeight);
+
+      rafHandle = requestAnimationFrame(drawMeter);
+    };
+
+    rafHandle = requestAnimationFrame(drawMeter);
+
+    return () => {
+      if (rafHandle) {
+        cancelAnimationFrame(rafHandle);
+      }
+    };
+  }, [core, meterRef, source]);
 };
