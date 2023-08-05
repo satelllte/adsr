@@ -4,7 +4,7 @@
 
 Simple synthesizer built with [Elementary Audio](https://www.elementary.audio/) framework.
 
-<img src="./public/og-image.png" width="600">
+<img src="./public/og-image.png">
 
 ## Development
 
