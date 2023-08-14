@@ -23,6 +23,7 @@ import {SynthPageSkeleton} from './SynthPageSkeleton';
 import {KnobsLayout} from './KnobsLayout';
 import {title} from './constants';
 import {SynthPageLayout} from './SynthPageLayout';
+import {useStateWithEffect} from '@/components/hooks/useStateWithEffect';
 
 const {colors} = resolveConfig(tailwindConfig).theme;
 
@@ -92,64 +93,61 @@ type SynthPageMainProps = {
   core: WebAudioRenderer;
 };
 
+const initialState = {
+  gate: 0,
+  freq: 440,
+  attack: 0.001,
+  decay: 0.6,
+  sustain: 0.7,
+  release: 0.6,
+};
+
+const meterLeftSource = 'meter:left';
+const meterRightSource = 'meter:right';
+
 function SynthPageMain({core}: SynthPageMainProps) {
-  const gateKey = 'gate';
-  const [gate, setGate] = useState(0);
-
-  const freqKey = 'freq';
-  const [freq, setFreq] = useState(440);
-
-  const attackKey = 'attack';
-  const [attack, setAttack] = useState(0.001);
-
-  const decayKey = 'decay';
-  const [decay, setDecay] = useState(0.6);
-
-  const sustainKey = 'sustain';
-  const [sustain, setSustain] = useState(0.7);
-
-  const releaseKey = 'release';
-  const [release, setRelease] = useState(0.6);
-
-  const meterLeftSource = 'meter:left';
-  const meterRightSource = 'meter:right';
-
   const meterLeftRef = useRef<HTMLCanvasElement>(null);
   const meterRightRef = useRef<HTMLCanvasElement>(null);
 
   useMeter({core, meterRef: meterLeftRef, source: meterLeftSource});
   useMeter({core, meterRef: meterRightRef, source: meterRightSource});
 
-  useEffect(() => {
-    const gateNode = el.const({key: gateKey, value: gate});
-    const freqNode = el.const({key: freqKey, value: freq});
-    const attackNode = el.const({key: attackKey, value: attack});
-    const decayNode = el.const({key: decayKey, value: decay});
-    const sustainNode = el.const({key: sustainKey, value: sustain});
-    const releaseNode = el.const({key: releaseKey, value: release});
+  const [state, setStateAndRender] = useStateWithEffect(
+    initialState,
+    useCallback(
+      (state) => {
+        const gateNode = el.const({key: 'gate', value: state.gate});
+        const freqNode = el.const({key: 'freq', value: state.freq});
+        const attackNode = el.const({key: 'attack', value: state.attack});
+        const decayNode = el.const({key: 'decay', value: state.decay});
+        const sustainNode = el.const({key: 'sustain', value: state.sustain});
+        const releaseNode = el.const({key: 'release', value: state.release});
 
-    const envelope = el.adsr(
-      attackNode,
-      decayNode,
-      sustainNode,
-      releaseNode,
-      gateNode,
-    );
-    const sine = el.cycle(freqNode);
-    const out = el.mul(envelope, sine);
-    core.render(
-      el.meter({name: meterLeftSource}, out),
-      el.meter({name: meterRightSource}, out),
-    );
-  }, [attack, core, decay, freq, gate, release, sustain]);
+        const envelope = el.adsr(
+          attackNode,
+          decayNode,
+          sustainNode,
+          releaseNode,
+          gateNode,
+        );
+        const sine = el.cycle(freqNode);
+        const out = el.mul(envelope, sine);
+        core.render(
+          el.meter({name: meterLeftSource}, out),
+          el.meter({name: meterRightSource}, out),
+        );
+      },
+      [core],
+    ),
+  );
 
   const play = useCallback(() => {
-    setGate(1);
-  }, []);
+    setStateAndRender({gate: 1});
+  }, [setStateAndRender]);
 
   const stop = useCallback(() => {
-    setGate(0);
-  }, []);
+    setStateAndRender({gate: 0});
+  }, [setStateAndRender]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -191,38 +189,48 @@ function SynthPageMain({core}: SynthPageMainProps) {
             isLarge
             title='Frequency'
             kind='frequency'
-            value={freq}
-            onChange={setFreq}
+            value={state.freq}
+            onChange={(value) => {
+              setStateAndRender({freq: value});
+            }}
           />
           <KnobInput
             title='Attack'
             kind='adr'
-            value={attack}
-            onChange={setAttack}
+            value={state.attack}
+            onChange={(value) => {
+              setStateAndRender({attack: value});
+            }}
           />
           <KnobInput
             title='Decay'
             kind='adr'
-            value={decay}
-            onChange={setDecay}
+            value={state.decay}
+            onChange={(value) => {
+              setStateAndRender({decay: value});
+            }}
           />
           <KnobInput
             title='Sustain'
             kind='percentage'
-            value={sustain}
-            onChange={setSustain}
+            value={state.sustain}
+            onChange={(value) => {
+              setStateAndRender({sustain: value});
+            }}
           />
           <KnobInput
             title='Release'
             kind='adr'
-            value={release}
-            onChange={setRelease}
+            value={state.release}
+            onChange={(value) => {
+              setStateAndRender({release: value});
+            }}
           />
         </KnobsLayout>
       </SynthContainer>
       <InteractionArea
         icon={<PlayIcon />}
-        title={"Touch here to play or press the 'Space' key."}
+        title="Touch here to play or press the 'Space' key."
         onTouchStart={play}
         onTouchEnd={stop}
         onMouseDown={play}
