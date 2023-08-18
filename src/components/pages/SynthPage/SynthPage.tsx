@@ -2,6 +2,7 @@
 import {type RefObject, useCallback, useEffect, useRef, useState} from 'react';
 import WebAudioRenderer from '@elemaudio/web-renderer';
 import {el} from '@elemaudio/core';
+
 import resolveConfig from 'tailwindcss/resolveConfig';
 import tailwindConfig from '@/../tailwind.config';
 import {
@@ -24,6 +25,8 @@ import {KnobsLayout} from './KnobsLayout';
 import {title} from './constants';
 import {SynthPageLayout} from './SynthPageLayout';
 import {useStateWithEffect} from '@/components/hooks/useStateWithEffect';
+import {MidiSelector} from '@/components/pages/SynthPage/MidiSelector';
+import {noteToFreq} from '@/utils/math/midi';
 
 const {colors} = resolveConfig(tailwindConfig).theme;
 
@@ -141,13 +144,19 @@ function SynthPageMain({core}: SynthPageMainProps) {
     ),
   );
 
-  const play = useCallback(() => {
-    setStateAndRender({gate: 1});
-  }, [setStateAndRender]);
+  const playNote = useCallback(
+    (midiNote: number) => {
+      setStateAndRender({gate: 1, freq: noteToFreq(midiNote)});
+    },
+    [setStateAndRender],
+  );
 
-  const stop = useCallback(() => {
-    setStateAndRender({gate: 0});
-  }, [setStateAndRender]);
+  const stopNote = useCallback(
+    (midiNote?: number) => {
+      setStateAndRender({gate: 0});
+    },
+    [setStateAndRender],
+  );
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -157,13 +166,13 @@ function SynthPageMain({core}: SynthPageMainProps) {
       }
 
       if (event.code === keyCodes.space) {
-        play();
+        playNote(60);
       }
     };
 
     const onKeyUp = (event: KeyboardEvent) => {
       if (event.code === keyCodes.space) {
-        stop();
+        stopNote();
       }
     };
 
@@ -174,13 +183,14 @@ function SynthPageMain({core}: SynthPageMainProps) {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
     };
-  }, [play, stop]);
+  }, [playNote, stopNote]);
 
   return (
     <SynthPageLayout>
       <SynthContainer
         isActivated
         title={title}
+        titleRight={<MidiSelector playNote={playNote} stopNote={stopNote} />}
         meterLeft={<Meter ref={meterLeftRef} />}
         meterRight={<Meter ref={meterRightRef} />}
       >
@@ -228,13 +238,22 @@ function SynthPageMain({core}: SynthPageMainProps) {
           />
         </KnobsLayout>
       </SynthContainer>
+
       <InteractionArea
         icon={<PlayIcon />}
         title="Touch here to play or press the 'Space' key."
-        onTouchStart={play}
-        onTouchEnd={stop}
-        onMouseDown={play}
-        onMouseUp={stop}
+        onTouchStart={() => {
+          playNote(60);
+        }}
+        onTouchEnd={() => {
+          stopNote();
+        }}
+        onMouseDown={() => {
+          playNote(60);
+        }}
+        onMouseUp={() => {
+          stopNote();
+        }}
       />
     </SynthPageLayout>
   );
