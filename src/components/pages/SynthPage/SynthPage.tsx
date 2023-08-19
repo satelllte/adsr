@@ -5,7 +5,7 @@ import {el, type NodeRepr_t} from '@elemaudio/core';
 import resolveConfig from 'tailwindcss/resolveConfig';
 import tailwindConfig from '@/../tailwind.config';
 import {
-  LinearSmoothedValue,
+  LinearSmoothedValueRealtime,
   clamp,
   dbMin,
   gainToDecibels,
@@ -324,7 +324,11 @@ const useMeter = ({
 
     const volumeDbMin = dbMin;
     const volumeDbMax = 0;
-    const volumeDb = new LinearSmoothedValue(volumeDbMin, volumeDbMin, 0.3);
+    const volumeDb = new LinearSmoothedValueRealtime({
+      currentValue: volumeDbMin,
+      targetValue: volumeDbMin,
+      rampDurationInMilliseconds: 300,
+    });
 
     type MeterEvent = {
       source?: string;
