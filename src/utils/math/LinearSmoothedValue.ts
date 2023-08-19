@@ -7,7 +7,7 @@
  * Note that the time domain is generic here,
  * so its consumers have full control over it, which means they have to:
  * - define units (e.g. seconds, milliseconds, samples, etc.)
- * - manually update time via `increaseTimeBy` method
+ * - manually update time via `increaseTimeBy` method before getting / setting the value
  */
 export class LinearSmoothedValue {
   private _currentValue: number;
