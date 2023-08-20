@@ -17,18 +17,18 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
   const [selectedDeviceIndex, setSelectedDeviceIndex] = useState(0);
 
   useEffect(() => {
-    const updateInputs = () => {
+    const updateDevices = () => {
       setDevices([...WebMidi.inputs]);
     };
 
-    WebMidi.addListener('enabled', updateInputs);
-    WebMidi.addListener('connected', updateInputs);
-    WebMidi.addListener('disconnected', updateInputs);
+    WebMidi.addListener('enabled', updateDevices);
+    WebMidi.addListener('connected', updateDevices);
+    WebMidi.addListener('disconnected', updateDevices);
 
     return () => {
-      WebMidi.removeListener('enabled', updateInputs);
-      WebMidi.removeListener('connected', updateInputs);
-      WebMidi.removeListener('disconnected', updateInputs);
+      WebMidi.removeListener('enabled', updateDevices);
+      WebMidi.removeListener('connected', updateDevices);
+      WebMidi.removeListener('disconnected', updateDevices);
     };
   }, []);
 
