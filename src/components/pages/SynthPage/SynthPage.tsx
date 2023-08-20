@@ -1,14 +1,15 @@
 'use client';
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {type RefObject, useCallback, useEffect, useRef, useState} from 'react';
 import WebAudioRenderer from '@elemaudio/web-renderer';
-import {el, type NodeRepr_t} from '@elemaudio/core';
+import {el} from '@elemaudio/core';
+
 import resolveConfig from 'tailwindcss/resolveConfig';
 import tailwindConfig from '@/../tailwind.config';
 import {
-  LinearSmoothedValue,
   clamp,
   dbMin,
   gainToDecibels,
+  LinearSmoothedValue,
   mapTo01Linear,
 } from '@/utils/math';
 import {keyCodes} from '@/constants/key-codes';
@@ -23,6 +24,9 @@ import {SynthPageSkeleton} from './SynthPageSkeleton';
 import {KnobsLayout} from './KnobsLayout';
 import {title} from './constants';
 import {SynthPageLayout} from './SynthPageLayout';
+import {useStateWithEffect} from '@/components/hooks/useStateWithEffect';
+import {MidiSelector} from '@/components/pages/SynthPage/MidiSelector';
+import {noteToFreq} from '@/utils/math/midi';
 
 const {colors} = resolveConfig(tailwindConfig).theme;
 
@@ -44,10 +48,18 @@ export function SynthPage() {
     const ctx = ctxRef.current;
     const core = coreRef.current;
 
-    (async () => {
-      const node = await core.initialize(ctx);
-      node.connect(ctx.destination);
-    })();
+    if (ctx.state !== 'running') {
+      void ctx.resume();
+    }
+
+    core
+      .initialize(ctx)
+      .then((node) => {
+        node.connect(ctx.destination);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 
     let timeoutId: ReturnType<typeof setTimeout>;
 
@@ -77,90 +89,77 @@ export function SynthPage() {
     throw new Error("Elementary core wasn't initialized properly");
   }
 
-  return <SynthPageMain ctx={ctx} core={core} />;
+  return <SynthPageMain core={core} />;
 }
 
 type SynthPageMainProps = {
-  ctx: AudioContext;
   core: WebAudioRenderer;
 };
 
-function SynthPageMain({ctx, core}: SynthPageMainProps) {
-  const gateKey = 'gate';
-  const gateDefault = 0;
+const initialState = {
+  gate: 0,
+  freq: 440,
+  attack: 0.001,
+  decay: 0.6,
+  sustain: 0.7,
+  release: 0.6,
+};
 
-  const freqKey = 'freq';
-  const freqDefault = 440;
+const meterLeftSource = 'meter:left';
+const meterRightSource = 'meter:right';
 
-  const attackKey = 'attack';
-  const attackDefault = 0.001;
-
-  const decayKey = 'decay';
-  const decayDefault = 0.6;
-
-  const sustainKey = 'sustain';
-  const sustainDefault = 0.7;
-
-  const releaseKey = 'release';
-  const releaseDefault = 0.6;
-
-  const gateRef = useRef<NodeRepr_t>(
-    el.const({key: gateKey, value: gateDefault}),
-  );
-  const freqRef = useRef<NodeRepr_t>(
-    el.const({key: freqKey, value: freqDefault}),
-  );
-  const attackRef = useRef<NodeRepr_t>(
-    el.const({key: attackKey, value: attackDefault}),
-  );
-  const decayRef = useRef<NodeRepr_t>(
-    el.const({key: decayKey, value: decayDefault}),
-  );
-  const sustainRef = useRef<NodeRepr_t>(
-    el.const({key: sustainKey, value: sustainDefault}),
-  );
-  const releaseRef = useRef<NodeRepr_t>(
-    el.const({key: releaseKey, value: releaseDefault}),
-  );
-
-  const meterLeftSource = 'meter:left';
-  const meterRightSource = 'meter:right';
-
+function SynthPageMain({core}: SynthPageMainProps) {
   const meterLeftRef = useRef<HTMLCanvasElement>(null);
   const meterRightRef = useRef<HTMLCanvasElement>(null);
 
   useMeter({core, meterRef: meterLeftRef, source: meterLeftSource});
   useMeter({core, meterRef: meterRightRef, source: meterRightSource});
 
-  const renderAudio = useCallback(async () => {
-    if (ctx.state !== 'running') {
-      await ctx.resume();
-    }
+  const [state, setStateAndRender] = useStateWithEffect(
+    initialState,
+    useCallback(
+      (state) => {
+        const gateNode = el.const({key: 'gate', value: state.gate});
+        const freqNode = el.const({key: 'freq', value: state.freq});
+        const attackNode = el.const({key: 'attack', value: state.attack});
+        const decayNode = el.const({key: 'decay', value: state.decay});
+        const sustainNode = el.const({key: 'sustain', value: state.sustain});
+        const releaseNode = el.const({key: 'release', value: state.release});
 
-    const gate = gateRef.current;
-    const freq = freqRef.current;
-    const attack = attackRef.current;
-    const decay = decayRef.current;
-    const sustain = sustainRef.current;
-    const release = releaseRef.current;
-    const envelope = el.adsr(attack, decay, sustain, release, gate);
-    const sine = el.cycle(freq);
-    const out = el.mul(envelope, sine);
-    core.render(
-      el.meter({name: meterLeftSource}, out),
-      el.meter({name: meterRightSource}, out),
-    );
-  }, [ctx, core]);
+        const envelope = el.adsr(
+          attackNode,
+          decayNode,
+          sustainNode,
+          releaseNode,
+          gateNode,
+        );
+        const sine = el.cycle(freqNode);
+        const out = el.mul(envelope, sine);
+        core.render(
+          el.meter({name: meterLeftSource}, out),
+          el.meter({name: meterRightSource}, out),
+        );
+      },
+      [core],
+    ),
+  );
 
-  const play = useCallback(() => {
-    gateRef.current = el.const({key: gateKey, value: 1});
-    void renderAudio();
-  }, [renderAudio]);
+  const playNote = useCallback(
+    (midiNote?: number) => {
+      const stateUpdate = midiNote
+        ? {gate: 1, freq: noteToFreq(midiNote)}
+        : {gate: 1};
+      setStateAndRender(stateUpdate);
+    },
+    [setStateAndRender],
+  );
 
-  const stop = useCallback(() => {
-    gateRef.current = el.const({key: gateKey, value: 0});
-    void renderAudio();
-  }, [renderAudio]);
+  const stopNote = useCallback(
+    (midiNote?: number) => {
+      setStateAndRender({gate: 0});
+    },
+    [setStateAndRender],
+  );
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -170,13 +169,13 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
       }
 
       if (event.code === keyCodes.space) {
-        play();
+        playNote();
       }
     };
 
     const onKeyUp = (event: KeyboardEvent) => {
       if (event.code === keyCodes.space) {
-        stop();
+        stopNote();
       }
     };
 
@@ -187,13 +186,14 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
     };
-  }, [play, stop]);
+  }, [playNote, stopNote]);
 
   return (
     <SynthPageLayout>
       <SynthContainer
         isActivated
         title={title}
+        titleRight={<MidiSelector playNote={playNote} stopNote={stopNote} />}
         meterLeft={<Meter ref={meterLeftRef} />}
         meterRight={<Meter ref={meterRightRef} />}
       >
@@ -202,52 +202,61 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
             isLarge
             title='Frequency'
             kind='frequency'
-            defaultValue={freqDefault}
-            constRef={freqRef}
-            constKey={freqKey}
-            onChange={renderAudio}
+            value={state.freq}
+            onChange={(value) => {
+              setStateAndRender({freq: value});
+            }}
           />
           <KnobInput
             title='Attack'
             kind='adr'
-            defaultValue={attackDefault}
-            constRef={attackRef}
-            constKey={attackKey}
-            onChange={renderAudio}
+            value={state.attack}
+            onChange={(value) => {
+              setStateAndRender({attack: value});
+            }}
           />
           <KnobInput
             title='Decay'
             kind='adr'
-            defaultValue={decayDefault}
-            constRef={decayRef}
-            constKey={decayKey}
-            onChange={renderAudio}
+            value={state.decay}
+            onChange={(value) => {
+              setStateAndRender({decay: value});
+            }}
           />
           <KnobInput
             title='Sustain'
             kind='percentage'
-            defaultValue={sustainDefault}
-            constRef={sustainRef}
-            constKey={sustainKey}
-            onChange={renderAudio}
+            value={state.sustain}
+            onChange={(value) => {
+              setStateAndRender({sustain: value});
+            }}
           />
           <KnobInput
             title='Release'
             kind='adr'
-            defaultValue={releaseDefault}
-            constRef={releaseRef}
-            constKey={releaseKey}
-            onChange={renderAudio}
+            value={state.release}
+            onChange={(value) => {
+              setStateAndRender({release: value});
+            }}
           />
         </KnobsLayout>
       </SynthContainer>
+
       <InteractionArea
         icon={<PlayIcon />}
-        title={"Touch here to play or press the 'Space' key."}
-        onTouchStart={play}
-        onTouchEnd={stop}
-        onMouseDown={play}
-        onMouseUp={stop}
+        title="Touch here to play or press the 'Space' key."
+        onTouchStart={() => {
+          playNote();
+        }}
+        onTouchEnd={() => {
+          stopNote();
+        }}
+        onMouseDown={() => {
+          playNote();
+        }}
+        onMouseUp={() => {
+          stopNote();
+        }}
       />
     </SynthPageLayout>
   );
@@ -258,33 +267,18 @@ type KnobInputProps = {
   isLarge?: boolean;
   kind: KnobInputKind;
   title: string;
-  defaultValue: number;
-  constRef: React.MutableRefObject<NodeRepr_t>;
-  constKey: string;
-  onChange: () => void;
+  value: number;
+  onChange: (value: number) => void;
 };
-function KnobInput({
-  isLarge,
-  kind,
-  title,
-  defaultValue,
-  constRef,
-  constKey,
-  onChange,
-}: KnobInputProps) {
-  const [value, setValue] = useState<number>(defaultValue);
+function KnobInput({isLarge, kind, title, value, onChange}: KnobInputProps) {
   const KnobComponent = resolveKnobComponent(kind);
   return (
     <KnobComponent
       isLarge={isLarge}
       title={title}
       value={value}
-      defaultValue={defaultValue}
-      onChange={(newValue) => {
-        constRef.current = el.const({key: constKey, value: newValue});
-        setValue(newValue);
-        onChange();
-      }}
+      defaultValue={value}
+      onChange={onChange}
     />
   );
 }
@@ -308,7 +302,7 @@ const useMeter = ({
   source,
 }: {
   core: WebAudioRenderer;
-  meterRef: React.RefObject<HTMLCanvasElement>;
+  meterRef: RefObject<HTMLCanvasElement>;
   source: string;
 }) => {
   useEffect(() => {
