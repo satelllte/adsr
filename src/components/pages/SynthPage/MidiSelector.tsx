@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {type Input, WebMidi} from 'webmidi';
+import {type Input, WebMidi, type NoteMessageEvent} from 'webmidi';
 
 type MidiSelectorProps = {
   playNote: (note: number) => void;
@@ -21,32 +21,34 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
       setDevices([...WebMidi.inputs]);
     };
 
-    const enabledListener = WebMidi.addListener('enabled', updateInputs);
-    const connectedListener = WebMidi.addListener('connected', updateInputs);
-    const disconnectedListener = WebMidi.addListener(
-      'disconnected',
-      updateInputs,
-    );
+    WebMidi.addListener('enabled', updateInputs);
+    WebMidi.addListener('connected', updateInputs);
+    WebMidi.addListener('disconnected', updateInputs);
+
     return () => {
-      if (!Array.isArray(enabledListener)) enabledListener.remove();
-      if (!Array.isArray(connectedListener)) connectedListener.remove();
-      if (!Array.isArray(disconnectedListener)) disconnectedListener.remove();
+      WebMidi.removeListener('enabled', updateInputs);
+      WebMidi.removeListener('connected', updateInputs);
+      WebMidi.removeListener('disconnected', updateInputs);
     };
   }, []);
 
   useEffect(() => {
     const selectedInput = devices[selectedIndex];
     if (selectedInput) {
-      const noteOnListener = selectedInput.addListener('noteon', ({note}) => {
+      const onNoteOn = ({note}: NoteMessageEvent) => {
         playNote(note.number);
-      });
-      const noteOffListener = selectedInput.addListener('noteoff', ({note}) => {
+      };
+
+      const onNoteOff = ({note}: NoteMessageEvent) => {
         stopNote(note.number);
-      });
+      };
+
+      selectedInput.addListener('noteon', onNoteOn);
+      selectedInput.addListener('noteoff', onNoteOff);
 
       return () => {
-        if (!Array.isArray(noteOnListener)) noteOnListener.remove();
-        if (!Array.isArray(noteOffListener)) noteOffListener.remove();
+        selectedInput.removeListener('noteon', onNoteOn);
+        selectedInput.removeListener('noteoff', onNoteOff);
       };
     }
   }, [devices, playNote, selectedIndex, stopNote]);
