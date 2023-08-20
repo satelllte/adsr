@@ -13,12 +13,19 @@ function connect() {
 }
 
 export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
+  const noDeviceId = 'NO_DEVICE_ID';
   const [devices, setDevices] = useState<Input[]>(WebMidi.inputs);
-  const [selectedDeviceIndex, setSelectedDeviceIndex] = useState(0);
+  const [deviceId, setDeviceId] = useState<string | undefined>();
 
   useEffect(() => {
     const updateDevices = () => {
-      setDevices([...WebMidi.inputs]);
+      const devices = [...WebMidi.inputs];
+      setDevices(devices);
+
+      if (devices.length === 1) {
+        // If there's only one device, select it automatically
+        setDeviceId(devices[0].id);
+      }
     };
 
     WebMidi.addListener('enabled', updateDevices);
@@ -33,7 +40,7 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
   }, []);
 
   useEffect(() => {
-    const device = devices[selectedDeviceIndex];
+    const device = deviceId ? WebMidi.getInputById(deviceId) : undefined;
     if (device) {
       const noteOn = ({note}: NoteMessageEvent) => {
         playNote(note.number);
@@ -51,7 +58,7 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
         device.removeListener('noteoff', noteOff);
       };
     }
-  }, [devices, playNote, selectedDeviceIndex, stopNote]);
+  }, [deviceId, playNote, stopNote]);
 
   if (!WebMidi.enabled) {
     return (
@@ -67,14 +74,20 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
 
   return (
     <select
-      value={selectedDeviceIndex}
+      value={deviceId}
       className='bg-gray-4 px-2'
       onChange={(event) => {
-        setSelectedDeviceIndex(parseInt(event.target.value, 10));
+        const {value} = event.target;
+        if (value === noDeviceId) {
+          setDeviceId(undefined);
+        } else {
+          setDeviceId(value);
+        }
       }}
     >
-      {devices.map((device, index) => (
-        <option key={device.id} value={index}>
+      <option value={noDeviceId}>No device</option>
+      {devices.map((device) => (
+        <option key={device.id} value={device.id}>
           {device.name}
         </option>
       ))}
