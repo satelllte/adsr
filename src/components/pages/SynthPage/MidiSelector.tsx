@@ -14,7 +14,7 @@ function connect() {
 
 export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
   const [devices, setDevices] = useState<Input[]>(WebMidi.inputs);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedDeviceIndex, setSelectedDeviceIndex] = useState(0);
 
   useEffect(() => {
     const updateInputs = () => {
@@ -33,8 +33,8 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
   }, []);
 
   useEffect(() => {
-    const selectedInput = devices[selectedIndex];
-    if (selectedInput) {
+    const device = devices[selectedDeviceIndex];
+    if (device) {
       const onNoteOn = ({note}: NoteMessageEvent) => {
         playNote(note.number);
       };
@@ -43,15 +43,15 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
         stopNote(note.number);
       };
 
-      selectedInput.addListener('noteon', onNoteOn);
-      selectedInput.addListener('noteoff', onNoteOff);
+      device.addListener('noteon', onNoteOn);
+      device.addListener('noteoff', onNoteOff);
 
       return () => {
-        selectedInput.removeListener('noteon', onNoteOn);
-        selectedInput.removeListener('noteoff', onNoteOff);
+        device.removeListener('noteon', onNoteOn);
+        device.removeListener('noteoff', onNoteOff);
       };
     }
-  }, [devices, playNote, selectedIndex, stopNote]);
+  }, [devices, playNote, selectedDeviceIndex, stopNote]);
 
   if (!WebMidi.enabled) {
     return (
@@ -67,10 +67,10 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
 
   return (
     <select
-      value={selectedIndex}
+      value={selectedDeviceIndex}
       className='bg-gray-4 px-2'
       onChange={(event) => {
-        setSelectedIndex(parseInt(event.target.value, 10));
+        setSelectedDeviceIndex(parseInt(event.target.value, 10));
       }}
     >
       {devices.map((device, index) => (
