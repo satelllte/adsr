@@ -35,7 +35,7 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
   }, []);
 
   useEffect(() => {
-    const selectedInput = WebMidi.inputs[selectedIndex];
+    const selectedInput = devices[selectedIndex];
     if (selectedInput) {
       const noteOnListener = selectedInput.addListener('noteon', ({note}) => {
         playNote(note.number);
@@ -49,7 +49,7 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
         if (!Array.isArray(noteOffListener)) noteOffListener.remove();
       };
     }
-  }, [playNote, selectedIndex, stopNote]);
+  }, [devices, playNote, selectedIndex, stopNote]);
 
   if (!WebMidi.enabled) {
     return (

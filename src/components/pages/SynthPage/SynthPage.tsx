@@ -145,8 +145,11 @@ function SynthPageMain({core}: SynthPageMainProps) {
   );
 
   const playNote = useCallback(
-    (midiNote: number) => {
-      setStateAndRender({gate: 1, freq: noteToFreq(midiNote)});
+    (midiNote?: number) => {
+      const stateUpdate = midiNote
+        ? {gate: 1, freq: noteToFreq(midiNote)}
+        : {gate: 1};
+      setStateAndRender(stateUpdate);
     },
     [setStateAndRender],
   );
@@ -166,7 +169,7 @@ function SynthPageMain({core}: SynthPageMainProps) {
       }
 
       if (event.code === keyCodes.space) {
-        playNote(60);
+        playNote();
       }
     };
 
@@ -243,13 +246,13 @@ function SynthPageMain({core}: SynthPageMainProps) {
         icon={<PlayIcon />}
         title="Touch here to play or press the 'Space' key."
         onTouchStart={() => {
-          playNote(60);
+          playNote();
         }}
         onTouchEnd={() => {
           stopNote();
         }}
         onMouseDown={() => {
-          playNote(60);
+          playNote();
         }}
         onMouseUp={() => {
           stopNote();
