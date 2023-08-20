@@ -35,20 +35,20 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
   useEffect(() => {
     const device = devices[selectedDeviceIndex];
     if (device) {
-      const onNoteOn = ({note}: NoteMessageEvent) => {
+      const noteOn = ({note}: NoteMessageEvent) => {
         playNote(note.number);
       };
 
-      const onNoteOff = ({note}: NoteMessageEvent) => {
+      const noteOff = ({note}: NoteMessageEvent) => {
         stopNote(note.number);
       };
 
-      device.addListener('noteon', onNoteOn);
-      device.addListener('noteoff', onNoteOff);
+      device.addListener('noteon', noteOn);
+      device.addListener('noteoff', noteOff);
 
       return () => {
-        device.removeListener('noteon', onNoteOn);
-        device.removeListener('noteoff', onNoteOff);
+        device.removeListener('noteon', noteOn);
+        device.removeListener('noteoff', noteOff);
       };
     }
   }, [devices, playNote, selectedDeviceIndex, stopNote]);
