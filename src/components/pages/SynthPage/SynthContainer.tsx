@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import {DotStatus} from '@/components/ui/DotStatus';
 
 type SynthContainerProps = {
   isActivated?: boolean;
@@ -18,12 +18,7 @@ export function SynthContainer({
   return (
     <div className='bg-gray-2'>
       <div className='flex select-none items-center gap-2 bg-gray-1 px-2 py-1 text-sm uppercase'>
-        <div
-          className={clsx(
-            'h-2 w-2 rounded-full',
-            isActivated ? 'bg-green' : 'bg-gray-3',
-          )}
-        />
+        <DotStatus isEnabled={isActivated} />
         {title}
       </div>
       <div className='flex'>

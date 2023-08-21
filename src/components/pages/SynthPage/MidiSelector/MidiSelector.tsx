@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
-import clsx from 'clsx';
 import {type Input, WebMidi, type NoteMessageEvent} from 'webmidi';
+import {MidiSelectorContainer} from './MidiSelectorContainer';
+import {Button} from '@/components/ui/Button';
 
 type MidiSelectorProps = {
   playNote: (note: number) => void;
@@ -70,40 +71,39 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
     }
   }, [deviceId, playNote, stopNote]);
 
-  const baseClassName = clsx('w-60 select-none bg-gray-4 px-2 py-1 text-xs');
+  const isEnabled = Boolean(enabled && deviceId);
 
   if (!enabled) {
     return (
-      <button type='button' className={baseClassName} onClick={connect}>
-        Enable MIDI
-      </button>
+      <MidiSelectorContainer isEnabled={isEnabled}>
+        <Button size='small' onClick={connect}>
+          Connect
+        </Button>
+      </MidiSelectorContainer>
     );
-  }
-
-  if (!devices.length) {
-    return <div className={baseClassName}>No MIDI devices detected</div>;
   }
 
   const noDeviceOptionId = 'NO_DEVICE_ID';
   return (
-    <select
-      value={deviceId}
-      className={baseClassName}
-      onChange={(event) => {
-        const {value} = event.target;
-        if (value === noDeviceOptionId) {
-          setDeviceId(undefined);
-        } else {
-          setDeviceId(value);
-        }
-      }}
-    >
-      <option value={noDeviceOptionId}>No device</option>
-      {devices.map((device) => (
-        <option key={device.id} value={device.id}>
-          {device.name}
-        </option>
-      ))}
-    </select>
+    <MidiSelectorContainer isEnabled={isEnabled}>
+      <select
+        value={deviceId}
+        onChange={(event) => {
+          const {value} = event.target;
+          if (value === noDeviceOptionId) {
+            setDeviceId(undefined);
+          } else {
+            setDeviceId(value);
+          }
+        }}
+      >
+        <option value={noDeviceOptionId}>No device</option>
+        {devices.map((device) => (
+          <option key={device.id} value={device.id}>
+            {device.name}
+          </option>
+        ))}
+      </select>
+    </MidiSelectorContainer>
   );
 }
