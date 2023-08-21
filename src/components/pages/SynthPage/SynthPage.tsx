@@ -125,6 +125,8 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
     el.const({key: releaseKey, value: releaseDefault}),
   );
 
+  const [freq, setFreq] = useState<number>(freqDefault);
+
   const meterLeftSource = 'meter:left';
   const meterRightSource = 'meter:right';
 
@@ -165,8 +167,15 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
   }, [renderAudio]);
 
   const playNote = (midiNote: number) => {
-    freqRef.current = el.const({key: freqKey, value: noteToFreq(midiNote)});
+    const value = noteToFreq(midiNote);
+    freqRef.current = el.const({key: freqKey, value});
+    setFreq(value);
     play();
+  };
+
+  const onFreqChange = (newFreq: number) => {
+    setFreq(newFreq);
+    void renderAudio();
   };
 
   useEffect(() => {
@@ -211,9 +220,10 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
             title='Frequency'
             kind='frequency'
             defaultValue={freqDefault}
+            value={freq}
             constRef={freqRef}
             constKey={freqKey}
-            onChange={renderAudio}
+            onChange={onFreqChange}
           />
           <KnobInput
             title='Attack'
@@ -268,15 +278,17 @@ type KnobInputProps = {
   kind: KnobInputKind;
   title: string;
   defaultValue: number;
+  value?: number;
   constRef: React.MutableRefObject<NodeRepr_t>;
   constKey: string;
-  onChange: () => void;
+  onChange: (newValue: number) => void;
 };
 function KnobInput({
   isLarge,
   kind,
   title,
   defaultValue,
+  value: valueFromProps,
   constRef,
   constKey,
   onChange,
@@ -287,12 +299,12 @@ function KnobInput({
     <KnobComponent
       isLarge={isLarge}
       title={title}
-      value={value}
+      value={valueFromProps ? valueFromProps : value}
       defaultValue={defaultValue}
       onChange={(newValue) => {
         constRef.current = el.const({key: constKey, value: newValue});
         setValue(newValue);
-        onChange();
+        onChange(newValue);
       }}
     />
   );
