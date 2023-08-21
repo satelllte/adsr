@@ -11,6 +11,7 @@ import {
   gainToDecibels,
   mapTo01Linear,
 } from '@/utils/math';
+import {noteToFreq} from '@/utils/math/midi';
 import {keyCodes} from '@/constants/key-codes';
 import {useElConst} from '@/components/hooks/useElConst';
 import {useElConstBool} from '@/components/hooks/useElConstBool';
@@ -20,13 +21,12 @@ import {KnobAdr} from '@/components/ui/KnobAdr';
 import {KnobFrequency} from '@/components/ui/KnobFrequency';
 import {InteractionArea} from '@/components/ui/InteractionArea';
 import {PlayIcon} from '@/components/icons';
+import {title} from './constants';
 import {SynthContainer} from './SynthContainer';
 import {SynthPageSkeleton} from './SynthPageSkeleton';
 import {KnobsLayout} from './KnobsLayout';
-import {title} from './constants';
 import {SynthPageLayout} from './SynthPageLayout';
-import {MidiSelector} from '@/components/pages/SynthPage/MidiSelector';
-import {noteToFreq} from '@/utils/math/midi';
+import {MidiSelector} from './MidiSelector';
 
 const {colors} = resolveConfig(tailwindConfig).theme;
 
