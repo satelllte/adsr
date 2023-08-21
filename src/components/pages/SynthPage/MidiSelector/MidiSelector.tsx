@@ -35,7 +35,7 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
       const devices = [...WebMidi.inputs];
       setDevices(devices);
 
-      // Select device automatically on:
+      // Select first device automatically on:
       // - first load
       // - if there's only one device left
       if ((isFirstLoad && devices.length) || devices.length === 1) {
