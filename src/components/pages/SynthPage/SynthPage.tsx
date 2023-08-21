@@ -163,12 +163,15 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
     void renderAudio();
   }, [gateConst, renderAudio]);
 
-  const playNote = (midiNote: number) => {
-    const value = midiNoteToFreq(midiNote);
-    freqConst.update(value);
-    setFreq(value);
-    play();
-  };
+  const playNote = useCallback(
+    (midiNote: number) => {
+      const value = midiNoteToFreq(midiNote);
+      freqConst.update(value);
+      setFreq(value);
+      play();
+    },
+    [freqConst, play],
+  );
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
