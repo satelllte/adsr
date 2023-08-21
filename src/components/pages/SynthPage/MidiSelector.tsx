@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import clsx from 'clsx';
 import {type Input, WebMidi, type NoteMessageEvent} from 'webmidi';
 
 type MidiSelectorProps = {
@@ -69,23 +70,25 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
     }
   }, [deviceId, playNote, stopNote]);
 
+  const baseClassName = clsx('w-60 select-none bg-gray-4 px-2 py-1 text-xs');
+
   if (!enabled) {
     return (
-      <button type='button' className='bg-gray-4 px-2' onClick={connect}>
+      <button type='button' className={baseClassName} onClick={connect}>
         Enable MIDI
       </button>
     );
   }
 
   if (!devices.length) {
-    return 'No MIDI devices detected';
+    return <div className={baseClassName}>No MIDI devices detected</div>;
   }
 
   const noDeviceOptionId = 'NO_DEVICE_ID';
   return (
     <select
       value={deviceId}
-      className='bg-gray-4 px-2'
+      className={baseClassName}
       onChange={(event) => {
         const {value} = event.target;
         if (value === noDeviceOptionId) {

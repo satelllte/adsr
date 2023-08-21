@@ -202,7 +202,6 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
       <SynthContainer
         isActivated
         title={title}
-        titleRight={<MidiSelector playNote={playNote} stopNote={stop} />}
         meterLeft={<Meter ref={meterLeftRef} />}
         meterRight={<Meter ref={meterRightRef} />}
       >
@@ -257,7 +256,6 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
           />
         </KnobsLayout>
       </SynthContainer>
-
       <InteractionArea
         icon={<PlayIcon />}
         title="Touch here to play or press the 'Space' key."
@@ -266,6 +264,7 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
         onMouseDown={play}
         onMouseUp={stop}
       />
+      <MidiSelector playNote={playNote} stopNote={stop} />
     </SynthPageLayout>
   );
 }

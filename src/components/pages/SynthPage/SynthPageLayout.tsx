@@ -1,5 +1,5 @@
 type SynthPageLayoutProps = {
-  children: [React.ReactNode, React.ReactNode];
+  children: [React.ReactNode, React.ReactNode, React.ReactNode];
 };
 
 export function SynthPageLayout({children}: SynthPageLayoutProps) {
@@ -10,6 +10,9 @@ export function SynthPageLayout({children}: SynthPageLayoutProps) {
       </div>
       <div className='flex w-full items-center justify-center px-4 pt-16'>
         {children[1]}
+      </div>
+      <div className='flex w-full items-center justify-center px-4 pt-4'>
+        {children[2]}
       </div>
     </div>
   );
