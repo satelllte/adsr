@@ -97,6 +97,7 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
   const freqKey = 'freq';
   const freqDefault = 440;
   const freqConst = useElConst(freqKey, freqDefault);
+  const [freq, setFreq] = useState<number>(freqDefault);
 
   const attackKey = 'attack';
   const attackDefault = 0.001;
@@ -113,8 +114,6 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
   const releaseKey = 'release';
   const releaseDefault = 0.6;
   const releaseConst = useElConst(releaseKey, releaseDefault);
-
-  const [freq, setFreq] = useState<number>(freqDefault);
 
   const meterLeftSource = 'meter:left';
   const meterRightSource = 'meter:right';
