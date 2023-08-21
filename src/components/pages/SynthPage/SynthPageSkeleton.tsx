@@ -1,7 +1,7 @@
 import {KnobSkeleton} from '@/components/ui/KnobSkeleton';
 import {MeterSkeleton} from '@/components/ui/Meter';
 import {InteractionAreaSkeleton} from '@/components/ui/InteractionArea';
-import {MidiSelectorSkeleton} from './MidiSelector';
+import {MidiSelectorSkeleton} from './MidiSelector/MidiSelectorSkeleton'; // Import `MidiSelectorSkeleton` directly from its file so it won't take "webmidi" dependency into the first load bundle
 import {SynthPageLayout} from './SynthPageLayout';
 import {SynthContainer} from './SynthContainer';
 import {KnobsLayout} from './KnobsLayout';
