@@ -87,9 +87,6 @@ type SynthPageMainProps = {
   core: WebAudioRenderer;
 };
 
-const meterLeftSource = 'meter:left';
-const meterRightSource = 'meter:right';
-
 function SynthPageMain({ctx, core}: SynthPageMainProps) {
   const gateKey = 'gate';
   const gateDefault = 0;
@@ -127,6 +124,9 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
   const releaseRef = useRef<NodeRepr_t>(
     el.const({key: releaseKey, value: releaseDefault}),
   );
+
+  const meterLeftSource = 'meter:left';
+  const meterRightSource = 'meter:right';
 
   const meterLeftRef = useRef<HTMLCanvasElement>(null);
   const meterRightRef = useRef<HTMLCanvasElement>(null);
