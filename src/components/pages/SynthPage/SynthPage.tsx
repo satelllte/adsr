@@ -24,6 +24,7 @@ import {SynthPageSkeleton} from './SynthPageSkeleton';
 import {KnobsLayout} from './KnobsLayout';
 import {title} from './constants';
 import {SynthPageLayout} from './SynthPageLayout';
+import {useElConstBool} from '@/components/hooks/useElConstBool';
 
 const {colors} = resolveConfig(tailwindConfig).theme;
 
@@ -88,8 +89,8 @@ type SynthPageMainProps = {
 
 function SynthPageMain({ctx, core}: SynthPageMainProps) {
   const gateKey = 'gate';
-  const gateDefault = 0;
-  const gateConst = useElConst(gateKey, gateDefault);
+  const gateDefault = false;
+  const gateConst = useElConstBool(gateKey, gateDefault);
 
   const freqKey = 'freq';
   const freqDefault = 440;
@@ -150,12 +151,12 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
   ]);
 
   const play = useCallback(() => {
-    gateConst.update(1);
+    gateConst.update(true);
     void renderAudio();
   }, [gateConst, renderAudio]);
 
   const stop = useCallback(() => {
-    gateConst.update(0);
+    gateConst.update(false);
     void renderAudio();
   }, [gateConst, renderAudio]);
 

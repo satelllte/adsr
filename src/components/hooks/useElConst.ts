@@ -2,7 +2,7 @@ import {el, type NodeRepr_t} from '@elemaudio/core';
 import {useRef} from 'react';
 
 /**
- * A hook that provides Elementary Audio `el.const`
+ * A hook that wraps Elementary Audio `el.const`
  */
 export const useElConst = (key: string, initialValue: number) => {
   const constRef = useRef<NodeRepr_t>(el.const({key, value: initialValue}));
