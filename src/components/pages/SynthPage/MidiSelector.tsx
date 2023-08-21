@@ -6,25 +6,35 @@ type MidiSelectorProps = {
   stopNote: (note: number) => void;
 };
 
-function connect() {
-  WebMidi.enable().catch((err) => {
-    console.error(err);
-  });
-}
-
 export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
+  const [enabled, setEnabled] = useState<boolean>(WebMidi.enabled);
   const [devices, setDevices] = useState<Input[]>(WebMidi.inputs);
   const [deviceId, setDeviceId] = useState<string | undefined>();
 
+  const connect = async () => {
+    try {
+      await WebMidi.enable();
+      setEnabled(true);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
+    let isFirstLoad = true;
+
     const updateDevices = () => {
       const devices = [...WebMidi.inputs];
       setDevices(devices);
 
-      if (devices.length === 1) {
-        // If there's only one device, select it automatically
+      // Select device automatically on:
+      // - first load
+      // - if there's only one device left
+      if ((isFirstLoad && devices.length) || devices.length === 1) {
         setDeviceId(devices[0].id);
       }
+
+      isFirstLoad = false;
     };
 
     WebMidi.addListener('enabled', updateDevices);
@@ -59,7 +69,7 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
     }
   }, [deviceId, playNote, stopNote]);
 
-  if (!WebMidi.enabled) {
+  if (!enabled) {
     return (
       <button type='button' className='bg-gray-4 px-2' onClick={connect}>
         Enable MIDI
