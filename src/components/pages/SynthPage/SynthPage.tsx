@@ -1,7 +1,7 @@
 'use client';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import WebAudioRenderer from '@elemaudio/web-renderer';
-import {el, type NodeRepr_t} from '@elemaudio/core';
+import {el} from '@elemaudio/core';
 import resolveConfig from 'tailwindcss/resolveConfig';
 import tailwindConfig from '@/../tailwind.config';
 import {
@@ -12,6 +12,8 @@ import {
   mapTo01Linear,
 } from '@/utils/math';
 import {keyCodes} from '@/constants/key-codes';
+import {useElConst} from '@/components/hooks/useElConst';
+import {useElConstBool} from '@/components/hooks/useElConstBool';
 import {Meter} from '@/components/ui/Meter';
 import {KnobPercentage} from '@/components/ui/KnobPercentage';
 import {KnobAdr} from '@/components/ui/KnobAdr';
@@ -89,41 +91,28 @@ type SynthPageMainProps = {
 
 function SynthPageMain({ctx, core}: SynthPageMainProps) {
   const gateKey = 'gate';
-  const gateDefault = 0;
+  const gateDefault = false;
+  const gateConst = useElConstBool(gateKey, gateDefault);
 
   const freqKey = 'freq';
   const freqDefault = 440;
+  const freqConst = useElConst(freqKey, freqDefault);
 
   const attackKey = 'attack';
   const attackDefault = 0.001;
+  const attackConst = useElConst(attackKey, attackDefault);
 
   const decayKey = 'decay';
   const decayDefault = 0.6;
+  const decayConst = useElConst(decayKey, decayDefault);
 
   const sustainKey = 'sustain';
   const sustainDefault = 0.7;
+  const sustainConst = useElConst(sustainKey, sustainDefault);
 
   const releaseKey = 'release';
   const releaseDefault = 0.6;
-
-  const gateRef = useRef<NodeRepr_t>(
-    el.const({key: gateKey, value: gateDefault}),
-  );
-  const freqRef = useRef<NodeRepr_t>(
-    el.const({key: freqKey, value: freqDefault}),
-  );
-  const attackRef = useRef<NodeRepr_t>(
-    el.const({key: attackKey, value: attackDefault}),
-  );
-  const decayRef = useRef<NodeRepr_t>(
-    el.const({key: decayKey, value: decayDefault}),
-  );
-  const sustainRef = useRef<NodeRepr_t>(
-    el.const({key: sustainKey, value: sustainDefault}),
-  );
-  const releaseRef = useRef<NodeRepr_t>(
-    el.const({key: releaseKey, value: releaseDefault}),
-  );
+  const releaseConst = useElConst(releaseKey, releaseDefault);
 
   const [freq, setFreq] = useState<number>(freqDefault);
 
@@ -141,12 +130,12 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
       await ctx.resume();
     }
 
-    const gate = gateRef.current;
-    const freq = freqRef.current;
-    const attack = attackRef.current;
-    const decay = decayRef.current;
-    const sustain = sustainRef.current;
-    const release = releaseRef.current;
+    const gate = gateConst.get();
+    const freq = freqConst.get();
+    const attack = attackConst.get();
+    const decay = decayConst.get();
+    const sustain = sustainConst.get();
+    const release = releaseConst.get();
     const envelope = el.adsr(attack, decay, sustain, release, gate);
     const sine = el.cycle(freq);
     const out = el.mul(envelope, sine);
@@ -154,28 +143,32 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
       el.meter({name: meterLeftSource}, out),
       el.meter({name: meterRightSource}, out),
     );
-  }, [ctx, core]);
+  }, [
+    ctx,
+    core,
+    gateConst,
+    freqConst,
+    attackConst,
+    decayConst,
+    sustainConst,
+    releaseConst,
+  ]);
 
   const play = useCallback(() => {
-    gateRef.current = el.const({key: gateKey, value: 1});
+    gateConst.update(true);
     void renderAudio();
-  }, [renderAudio]);
+  }, [gateConst, renderAudio]);
 
   const stop = useCallback(() => {
-    gateRef.current = el.const({key: gateKey, value: 0});
+    gateConst.update(false);
     void renderAudio();
-  }, [renderAudio]);
+  }, [gateConst, renderAudio]);
 
   const playNote = (midiNote: number) => {
     const value = noteToFreq(midiNote);
-    freqRef.current = el.const({key: freqKey, value});
+    freqConst.update(value);
     setFreq(value);
     play();
-  };
-
-  const onFreqChange = (newFreq: number) => {
-    setFreq(newFreq);
-    void renderAudio();
   };
 
   useEffect(() => {
@@ -221,41 +214,47 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
             kind='frequency'
             defaultValue={freqDefault}
             value={freq}
-            constRef={freqRef}
-            constKey={freqKey}
-            onChange={onFreqChange}
+            onChange={(newValue) => {
+              freqConst.update(newValue);
+              void renderAudio();
+              setFreq(newValue);
+            }}
           />
           <KnobInput
             title='Attack'
             kind='adr'
             defaultValue={attackDefault}
-            constRef={attackRef}
-            constKey={attackKey}
-            onChange={renderAudio}
+            onChange={(newValue) => {
+              attackConst.update(newValue);
+              void renderAudio();
+            }}
           />
           <KnobInput
             title='Decay'
             kind='adr'
             defaultValue={decayDefault}
-            constRef={decayRef}
-            constKey={decayKey}
-            onChange={renderAudio}
+            onChange={(newValue) => {
+              decayConst.update(newValue);
+              void renderAudio();
+            }}
           />
           <KnobInput
             title='Sustain'
             kind='percentage'
             defaultValue={sustainDefault}
-            constRef={sustainRef}
-            constKey={sustainKey}
-            onChange={renderAudio}
+            onChange={(newValue) => {
+              sustainConst.update(newValue);
+              void renderAudio();
+            }}
           />
           <KnobInput
             title='Release'
             kind='adr'
             defaultValue={releaseDefault}
-            constRef={releaseRef}
-            constKey={releaseKey}
-            onChange={renderAudio}
+            onChange={(newValue) => {
+              releaseConst.update(newValue);
+              void renderAudio();
+            }}
           />
         </KnobsLayout>
       </SynthContainer>
@@ -279,8 +278,6 @@ type KnobInputProps = {
   title: string;
   defaultValue: number;
   value?: number;
-  constRef: React.MutableRefObject<NodeRepr_t>;
-  constKey: string;
   onChange: (newValue: number) => void;
 };
 function KnobInput({
@@ -289,8 +286,6 @@ function KnobInput({
   title,
   defaultValue,
   value: valueFromProps,
-  constRef,
-  constKey,
   onChange,
 }: KnobInputProps) {
   const [value, setValue] = useState<number>(defaultValue);
@@ -302,7 +297,6 @@ function KnobInput({
       value={valueFromProps ? valueFromProps : value}
       defaultValue={defaultValue}
       onChange={(newValue) => {
-        constRef.current = el.const({key: constKey, value: newValue});
         setValue(newValue);
         onChange(newValue);
       }}
