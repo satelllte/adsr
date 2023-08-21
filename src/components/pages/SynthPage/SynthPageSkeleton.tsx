@@ -23,9 +23,6 @@ export function SynthPageSkeleton() {
         </KnobsLayout>
       </SynthContainer>
       <InteractionAreaSkeleton />
-
-      {/* TODO: add skeleton for `MidiSelector` component */}
-      <div>...</div>
     </SynthPageLayout>
   );
 }

@@ -198,7 +198,9 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
   }, [play, stop]);
 
   return (
-    <SynthPageLayout>
+    <SynthPageLayout
+      topPanel={<MidiSelector playNote={playNote} stopNote={stop} />}
+    >
       <SynthContainer
         isActivated
         title={title}
@@ -264,7 +266,6 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
         onMouseDown={play}
         onMouseUp={stop}
       />
-      <MidiSelector playNote={playNote} stopNote={stop} />
     </SynthPageLayout>
   );
 }
