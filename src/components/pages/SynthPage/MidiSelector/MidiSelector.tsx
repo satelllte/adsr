@@ -10,6 +10,7 @@ type MidiSelectorProps = {
 
 export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
   const [enabled, setEnabled] = useState<boolean>(WebMidi.enabled);
+  const [error, setError] = useState<string | undefined>();
   const [devices, setDevices] = useState<Input[]>(WebMidi.inputs);
   const [deviceId, setDeviceId] = useState<string | undefined>();
 
@@ -18,7 +19,12 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
       await WebMidi.enable();
       setEnabled(true);
     } catch (error) {
-      console.error(error);
+      if (!WebMidi.supported) {
+        setError('Not supported');
+        return;
+      }
+
+      setError('Unexpected error');
     }
   };
 
@@ -71,11 +77,17 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
     }
   }, [deviceId, playNote, stopNote]);
 
-  const isEnabled = Boolean(enabled && deviceId);
+  const isActive = Boolean(enabled && deviceId);
+
+  if (error) {
+    return (
+      <MidiSelectorContainer isActive={isActive}>{error}</MidiSelectorContainer>
+    );
+  }
 
   if (!enabled) {
     return (
-      <MidiSelectorContainer isEnabled={isEnabled}>
+      <MidiSelectorContainer isActive={isActive}>
         <Button size='small' onClick={connect}>
           Connect
         </Button>
@@ -85,8 +97,9 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
 
   const noDeviceOptionId = 'NO_DEVICE_ID';
   return (
-    <MidiSelectorContainer isEnabled={isEnabled}>
+    <MidiSelectorContainer isActive={isActive}>
       <select
+        className='absolute w-full max-w-full bg-gray-4 outline-none webkit-tap-transparent focus-visible:outline-1 focus-visible:outline-gray-5'
         value={deviceId}
         onChange={(event) => {
           const {value} = event.target;
