@@ -1,3 +1,4 @@
+import {useMemo} from 'react';
 import {useElConst} from './useElConst';
 
 /**
@@ -6,12 +7,15 @@ import {useElConst} from './useElConst';
  */
 export const useElConstBool = (key: string, initialValue: boolean) => {
   const elConst = useElConst(key, toNumber(initialValue));
-  return {
-    ...elConst,
-    update(value: boolean) {
-      elConst.update(toNumber(value));
-    },
-  };
+  return useMemo(
+    () => ({
+      ...elConst,
+      update(value: boolean) {
+        elConst.update(toNumber(value));
+      },
+    }),
+    [elConst],
+  );
 };
 
 const toNumber = (value: boolean): number => (value ? 1 : 0);

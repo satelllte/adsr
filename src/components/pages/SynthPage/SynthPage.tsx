@@ -11,6 +11,7 @@ import {
   gainToDecibels,
   mapTo01Linear,
 } from '@/utils/math';
+import {midiNoteToFreq} from '@/utils/math/midi';
 import {keyCodes} from '@/constants/key-codes';
 import {useElConst} from '@/components/hooks/useElConst';
 import {useElConstBool} from '@/components/hooks/useElConstBool';
@@ -20,11 +21,12 @@ import {KnobAdr} from '@/components/ui/KnobAdr';
 import {KnobFrequency} from '@/components/ui/KnobFrequency';
 import {InteractionArea} from '@/components/ui/InteractionArea';
 import {PlayIcon} from '@/components/icons';
+import {title} from './constants';
 import {SynthContainer} from './SynthContainer';
 import {SynthPageSkeleton} from './SynthPageSkeleton';
 import {KnobsLayout} from './KnobsLayout';
-import {title} from './constants';
 import {SynthPageLayout} from './SynthPageLayout';
+import {MidiSelector} from './MidiSelector';
 
 const {colors} = resolveConfig(tailwindConfig).theme;
 
@@ -95,6 +97,7 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
   const freqKey = 'freq';
   const freqDefault = 440;
   const freqConst = useElConst(freqKey, freqDefault);
+  const [freq, setFreq] = useState<number>(freqDefault);
 
   const attackKey = 'attack';
   const attackDefault = 0.001;
@@ -160,6 +163,16 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
     void renderAudio();
   }, [gateConst, renderAudio]);
 
+  const playNote = useCallback(
+    (midiNote: number) => {
+      const value = midiNoteToFreq(midiNote);
+      freqConst.update(value);
+      setFreq(value);
+      play();
+    },
+    [freqConst, play],
+  );
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.repeat) {
@@ -188,7 +201,9 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
   }, [play, stop]);
 
   return (
-    <SynthPageLayout>
+    <SynthPageLayout
+      topPanel={<MidiSelector playNote={playNote} stopNote={stop} />}
+    >
       <SynthContainer
         isActivated
         title={title}
@@ -201,9 +216,11 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
             title='Frequency'
             kind='frequency'
             defaultValue={freqDefault}
+            value={freq}
             onChange={(newValue) => {
               freqConst.update(newValue);
               void renderAudio();
+              setFreq(newValue);
             }}
           />
           <KnobInput
@@ -246,7 +263,7 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
       </SynthContainer>
       <InteractionArea
         icon={<PlayIcon />}
-        title={"Touch here to play or press the 'Space' key."}
+        title="Touch here to play or press the 'Space' key."
         onTouchStart={play}
         onTouchEnd={stop}
         onMouseDown={play}
@@ -262,6 +279,7 @@ type KnobInputProps = {
   kind: KnobInputKind;
   title: string;
   defaultValue: number;
+  value?: number;
   onChange: (newValue: number) => void;
 };
 function KnobInput({
@@ -269,6 +287,7 @@ function KnobInput({
   kind,
   title,
   defaultValue,
+  value: valueFromProps,
   onChange,
 }: KnobInputProps) {
   const [value, setValue] = useState<number>(defaultValue);
@@ -277,7 +296,7 @@ function KnobInput({
     <KnobComponent
       isLarge={isLarge}
       title={title}
-      value={value}
+      value={valueFromProps ?? value}
       defaultValue={defaultValue}
       onChange={(newValue) => {
         setValue(newValue);
