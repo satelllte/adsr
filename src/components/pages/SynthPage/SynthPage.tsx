@@ -13,6 +13,7 @@ import {
 } from '@/utils/math';
 import {keyCodes} from '@/constants/key-codes';
 import {useElConst} from '@/components/hooks/useElConst';
+import {useElConstBool} from '@/components/hooks/useElConstBool';
 import {Meter} from '@/components/ui/Meter';
 import {KnobPercentage} from '@/components/ui/KnobPercentage';
 import {KnobAdr} from '@/components/ui/KnobAdr';
@@ -24,7 +25,6 @@ import {SynthPageSkeleton} from './SynthPageSkeleton';
 import {KnobsLayout} from './KnobsLayout';
 import {title} from './constants';
 import {SynthPageLayout} from './SynthPageLayout';
-import {useElConstBool} from '@/components/hooks/useElConstBool';
 
 const {colors} = resolveConfig(tailwindConfig).theme;
 
