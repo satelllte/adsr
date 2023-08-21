@@ -13,7 +13,6 @@ function connect() {
 }
 
 export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
-  const noDeviceId = 'NO_DEVICE_ID';
   const [devices, setDevices] = useState<Input[]>(WebMidi.inputs);
   const [deviceId, setDeviceId] = useState<string | undefined>();
 
@@ -72,20 +71,21 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
     return 'No MIDI devices detected';
   }
 
+  const noDeviceOptionId = 'NO_DEVICE_ID';
   return (
     <select
       value={deviceId}
       className='bg-gray-4 px-2'
       onChange={(event) => {
         const {value} = event.target;
-        if (value === noDeviceId) {
+        if (value === noDeviceOptionId) {
           setDeviceId(undefined);
         } else {
           setDeviceId(value);
         }
       }}
     >
-      <option value={noDeviceId}>No device</option>
+      <option value={noDeviceOptionId}>No device</option>
       {devices.map((device) => (
         <option key={device.id} value={device.id}>
           {device.name}
