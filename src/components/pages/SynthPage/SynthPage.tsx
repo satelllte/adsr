@@ -293,7 +293,7 @@ function KnobInput({
     <KnobComponent
       isLarge={isLarge}
       title={title}
-      value={valueFromProps ? valueFromProps : value}
+      value={valueFromProps ?? value}
       defaultValue={defaultValue}
       onChange={(newValue) => {
         setValue(newValue);
