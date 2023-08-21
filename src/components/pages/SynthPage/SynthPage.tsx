@@ -11,7 +11,7 @@ import {
   gainToDecibels,
   mapTo01Linear,
 } from '@/utils/math';
-import {noteToFreq} from '@/utils/math/midi';
+import {midiNoteToFreq} from '@/utils/math/midi';
 import {keyCodes} from '@/constants/key-codes';
 import {useElConst} from '@/components/hooks/useElConst';
 import {useElConstBool} from '@/components/hooks/useElConstBool';
@@ -164,7 +164,7 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
   }, [gateConst, renderAudio]);
 
   const playNote = (midiNote: number) => {
-    const value = noteToFreq(midiNote);
+    const value = midiNoteToFreq(midiNote);
     freqConst.update(value);
     setFreq(value);
     play();
