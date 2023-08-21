@@ -58,23 +58,25 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
 
   useEffect(() => {
     const device = deviceId ? WebMidi.getInputById(deviceId) : undefined;
-    if (device) {
-      const noteOn = ({note}: NoteMessageEvent) => {
-        playNote(note.number);
-      };
-
-      const noteOff = ({note}: NoteMessageEvent) => {
-        stopNote(note.number);
-      };
-
-      device.addListener('noteon', noteOn);
-      device.addListener('noteoff', noteOff);
-
-      return () => {
-        device.removeListener('noteon', noteOn);
-        device.removeListener('noteoff', noteOff);
-      };
+    if (!device) {
+      return;
     }
+
+    const noteOn = ({note}: NoteMessageEvent) => {
+      playNote(note.number);
+    };
+
+    const noteOff = ({note}: NoteMessageEvent) => {
+      stopNote(note.number);
+    };
+
+    device.addListener('noteon', noteOn);
+    device.addListener('noteoff', noteOff);
+
+    return () => {
+      device.removeListener('noteon', noteOn);
+      device.removeListener('noteoff', noteOff);
+    };
   }, [deviceId, playNote, stopNote]);
 
   const isActive = Boolean(enabled && deviceId);
