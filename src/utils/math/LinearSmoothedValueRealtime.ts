@@ -45,6 +45,6 @@ export class LinearSmoothedValueRealtime {
   }
 
   private _updateTime(): void {
-    this._lsv.increaseTimeBy(this._now() - this._lsv.currentTime);
+    this._lsv.advanceTimeBy(this._now() - this._lsv.currentTime);
   }
 }
