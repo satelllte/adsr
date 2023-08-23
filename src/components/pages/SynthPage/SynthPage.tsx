@@ -205,7 +205,7 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
       topPanel={<MidiSelector playNote={playNote} stopNote={stop} />}
     >
       <SynthContainer
-        isActivated
+        isEnabled
         title={title}
         meterLeft={<Meter ref={meterLeftRef} />}
         meterRight={<Meter ref={meterRightRef} />}

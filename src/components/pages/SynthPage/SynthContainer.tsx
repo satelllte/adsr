@@ -1,7 +1,7 @@
 import {DotStatus} from '@/components/ui/DotStatus';
 
 type SynthContainerProps = {
-  isActivated?: boolean;
+  isEnabled?: boolean;
   title: string;
   children: React.ReactNode;
   meterLeft: React.ReactNode;
@@ -9,7 +9,7 @@ type SynthContainerProps = {
 };
 
 export function SynthContainer({
-  isActivated = false,
+  isEnabled = false,
   title,
   children,
   meterLeft,
@@ -18,7 +18,7 @@ export function SynthContainer({
   return (
     <div className='bg-gray-2'>
       <div className='flex select-none items-center gap-2 bg-gray-1 px-2 py-1 text-sm uppercase'>
-        <DotStatus isEnabled={isActivated} />
+        <DotStatus status={isEnabled ? 'enabled' : 'disabled'} />
         {title}
       </div>
       <div className='flex'>
