@@ -1,4 +1,5 @@
 import {describe, expect, it} from 'vitest';
+import {sleep} from '../promise/sleep';
 import {PerformanceNowMock} from './PerformanceNowMock';
 
 describe('PerformanceNowMock', () => {
@@ -57,8 +58,3 @@ describe('PerformanceNowMock', () => {
     expect(realTimestampEnd).toBeGreaterThan(realTimestampStart);
   });
 });
-
-const sleep = async (ms: number) =>
-  new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
