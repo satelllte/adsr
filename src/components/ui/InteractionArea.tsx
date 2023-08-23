@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import {type ComponentProps} from 'react';
+import {Skeleton} from './Skeleton';
 
 type DivProps = ComponentProps<'div'>;
 
@@ -24,7 +25,7 @@ export function InteractionArea({icon, title, ...rest}: InteractionAreaProps) {
 export function InteractionAreaSkeleton() {
   return (
     <div className={baseClass}>
-      <div className='h-full w-full bg-gray-5 motion-safe:animate-pulse' />
+      <Skeleton />
     </div>
   );
 }
