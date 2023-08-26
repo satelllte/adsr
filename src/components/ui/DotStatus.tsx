@@ -1,15 +1,17 @@
 import clsx from 'clsx';
 
 type DotStatusProps = {
-  isEnabled: boolean;
+  status: 'enabled' | 'disabled' | 'error';
 };
 
-export function DotStatus({isEnabled}: DotStatusProps) {
+export function DotStatus({status}: DotStatusProps) {
   return (
     <div
       className={clsx(
         'h-2 w-2 rounded-full',
-        isEnabled ? 'bg-green' : 'bg-gray-3',
+        status === 'enabled' && 'bg-green',
+        status === 'disabled' && 'bg-gray-3',
+        status === 'error' && 'bg-red',
       )}
     />
   );
