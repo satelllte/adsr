@@ -3,7 +3,7 @@ import {MidiSelectorContainer} from './MidiSelectorContainer';
 
 export function MidiSelectorSkeleton() {
   return (
-    <MidiSelectorContainer isActive={false}>
+    <MidiSelectorContainer status='disabled'>
       <Skeleton />
     </MidiSelectorContainer>
   );

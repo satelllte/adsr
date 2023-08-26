@@ -79,17 +79,15 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
     };
   }, [deviceId, playNote, stopNote]);
 
-  const isActive = Boolean(enabled && deviceId);
-
   if (error) {
     return (
-      <MidiSelectorContainer isActive={isActive}>{error}</MidiSelectorContainer>
+      <MidiSelectorContainer status='error'>{error}</MidiSelectorContainer>
     );
   }
 
   if (!enabled) {
     return (
-      <MidiSelectorContainer isActive={isActive}>
+      <MidiSelectorContainer status='disabled'>
         <Button size='small' onClick={connect}>
           Connect
         </Button>
@@ -97,9 +95,10 @@ export function MidiSelector({playNote, stopNote}: MidiSelectorProps) {
     );
   }
 
+  const status = deviceId ? 'enabled' : 'disabled';
   const noDeviceOptionId = 'NO_DEVICE_ID';
   return (
-    <MidiSelectorContainer isActive={isActive}>
+    <MidiSelectorContainer status={status}>
       <select
         className='absolute w-full max-w-full bg-gray-4 outline-none webkit-tap-transparent focus-visible:outline-1 focus-visible:outline-gray-5'
         value={deviceId}
