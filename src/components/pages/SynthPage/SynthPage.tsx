@@ -12,6 +12,7 @@ import {useElConst} from '@/components/hooks/useElConst';
 import {useElConstBool} from '@/components/hooks/useElConstBool';
 import {Meter} from '@/components/ui/Meter';
 import {KnobPercentage} from '@/components/ui/KnobPercentage';
+import {KnobPercentage as KnobPercentageV2} from '@/components/ui/v2/KnobPercentage';
 import {KnobAdr} from '@/components/ui/KnobAdr';
 import {KnobFrequency} from '@/components/ui/KnobFrequency';
 import {InteractionArea} from '@/components/ui/InteractionArea';
@@ -236,10 +237,9 @@ function SynthPageMain({ctx, core}: SynthPageMainProps) {
               void renderAudio();
             }}
           />
-          <KnobInput
-            title='Sustain'
-            kind='percentage'
-            defaultValue={sustainDefault}
+          <KnobPercentageV2Wrapped
+            label='Sustain'
+            valueDefault={sustainDefault}
             onChange={(newValue) => {
               sustainConst.update(newValue);
               void renderAudio();
@@ -313,6 +313,27 @@ const resolveKnobComponent = (kind: KnobInputKind) => {
       throw new Error('Unknown knob kind', kind);
   }
 };
+
+type KnobPercentageV2Props = React.ComponentProps<typeof KnobPercentageV2>;
+type KnobPercentageV2WrappedProps = Omit<KnobPercentageV2Props, 'value'>;
+function KnobPercentageV2Wrapped({
+  label,
+  valueDefault,
+  onChange,
+}: KnobPercentageV2WrappedProps) {
+  const [value, setValue] = useState(valueDefault);
+  return (
+    <KnobPercentageV2
+      label={label}
+      value={value}
+      valueDefault={valueDefault}
+      onChange={(newValue) => {
+        setValue(newValue);
+        onChange(newValue);
+      }}
+    />
+  );
+}
 
 const useMeter = ({
   core,
