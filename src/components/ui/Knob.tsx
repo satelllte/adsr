@@ -1,9 +1,10 @@
 import {keyCodes} from '@/constants/key-codes';
 import {isNumberKey} from '@/utils/keyboard';
-import {clamp, clamp01, mapFrom01Linear, mapTo01Linear} from '@/utils/math';
 import {useDrag} from '@use-gesture/react';
 import clsx from 'clsx';
 import {useEffect, useId, useRef, useState} from 'react';
+import {KnobHeadless} from 'react-knob-headless';
+import {clamp, clamp01, mapFrom01Linear, mapTo01Linear} from '@dsp-ts/math';
 
 export type KnobProps = {
   isLarge?: boolean;

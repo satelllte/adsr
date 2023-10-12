@@ -2,15 +2,10 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import WebAudioRenderer from '@elemaudio/web-renderer';
 import {el} from '@elemaudio/core';
+import {clamp, mapTo01Linear} from '@dsp-ts/math';
 import resolveConfig from 'tailwindcss/resolveConfig';
 import tailwindConfig from '@/../tailwind.config';
-import {
-  LinearSmoothedValueRealtime,
-  clamp,
-  dbMin,
-  gainToDecibels,
-  mapTo01Linear,
-} from '@/utils/math';
+import {LinearSmoothedValueRealtime, dbMin, gainToDecibels} from '@/utils/math';
 import {midiNoteToFreq} from '@/utils/math/midi';
 import {keyCodes} from '@/constants/key-codes';
 import {useElConst} from '@/components/hooks/useElConst';
