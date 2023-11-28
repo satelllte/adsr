@@ -2,6 +2,7 @@
 import {Suspense, lazy, useState} from 'react';
 import {PlayIcon} from '@/components/icons';
 import {Button} from '@/components/ui/Button';
+import {GitHubLink} from '@/components/ui/GitHubLink';
 import {SynthPageSkeleton} from '@/components/pages/SynthPage/SynthPageSkeleton';
 
 const SynthPage = lazy(async () => {
@@ -22,6 +23,9 @@ export default function IndexPage() {
         <Button size='large' aria-label='Launch' onClick={launch}>
           <PlayIcon />
         </Button>
+        <div className='absolute bottom-2'>
+          <GitHubLink />
+        </div>
       </div>
     );
   }
