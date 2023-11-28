@@ -1,9 +1,13 @@
-import {keyCodes} from '@/constants/key-codes';
-import {isNumberKey} from '@/utils/keyboard';
-import {clamp, clamp01, mapFrom01Linear, mapTo01Linear} from '@/utils/math';
-import {useDrag} from '@use-gesture/react';
 import clsx from 'clsx';
 import {useEffect, useId, useRef, useState} from 'react';
+import {
+  KnobHeadless,
+  KnobHeadlessLabel,
+  KnobHeadlessOutput,
+} from 'react-knob-headless';
+import {clamp, clamp01, mapFrom01Linear, mapTo01Linear} from '@/utils/math';
+import {isNumberKey} from '@/utils/keyboard';
+import {keyCodes} from '@/constants/key-codes';
 
 export type KnobProps = {
   isLarge?: boolean;
@@ -56,9 +60,9 @@ export function Knob({
   mapTo01 = mapTo01Linear,
   mapFrom01 = mapFrom01Linear,
 }: KnobProps) {
-  const id = useId();
-
-  const knobContainerRef = useRef<HTMLDivElement>(null);
+  const knobRef = useRef<HTMLDivElement>(null);
+  const knobId = useId();
+  const labelId = useId();
 
   const [hasManualInputInitialValue, setHasManualInputInitialValue] =
     useState(true);
@@ -74,7 +78,7 @@ export function Knob({
 
   const closeManualInput = () => {
     setIsManualInputActive(false);
-    knobContainerRef.current?.focus(); // Re-focus back on the knob container
+    knobRef.current?.focus(); // Re-focus back on the knob
   };
 
   const value01 = mapTo01(value, min, max);
@@ -99,6 +103,8 @@ export function Knob({
   const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
     const {code, key} = event;
 
+    event.preventDefault(); // Prevent scrolling the page on arrow up/down press
+
     if (code === keyCodes.arrowLeft || code === keyCodes.arrowDown) {
       changeValue01By(-0.01);
       return;
@@ -120,41 +126,37 @@ export function Knob({
     }
   };
 
-  const bindDrag = useDrag(({delta}) => {
-    const diff01 = delta[1] * -0.006; // Multiplying by negative sensitivity. Vertical axis (Y) direction of the screen is inverted.
-    changeValue01By(diff01);
-  });
-
   return (
     <div className='relative text-xs'>
       <div
-        ref={knobContainerRef}
         className={clsx(
-          'flex select-none flex-col items-center outline-none focus:outline-dashed focus:outline-1 focus:outline-gray-4',
+          'flex select-none flex-col items-center outline-none focus-within:outline-dashed focus-within:outline-1 focus-within:outline-gray-4',
           isLarge ? 'w-20' : 'w-16',
         )}
-        tabIndex={-1} // Making element focusable by mouse / touch (not Tab). Details: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex
-        onKeyDown={onKeyDown}
-        onPointerDown={(event) => {
-          // Touch devices have a delay before focusing so it won't focus if touch immediately moves away from target (sliding). We want thumb to focus regardless.
-          // See, for reference, Radix UI Slider does the same: https://github.com/radix-ui/primitives/blob/eca6babd188df465f64f23f3584738b85dba610e/packages/react/slider/src/Slider.tsx#L442-L445
-          event.currentTarget.focus();
+        onPointerDown={() => {
+          // Focus the knob when clicked on any part of the container
+          knobRef.current?.focus();
         }}
       >
-        <label htmlFor={id}>{title}</label>
-        <div
-          id={id}
+        <KnobHeadlessLabel id={labelId}>{title}</KnobHeadlessLabel>
+        <KnobHeadless
+          ref={knobRef}
+          id={knobId}
+          aria-labelledby={labelId}
           className={clsx(
-            'relative touch-none', // It's recommended to disable "touch-action" for use-gesture: https://use-gesture.netlify.app/docs/extras/#touch-action
+            'relative outline-none',
             isLarge ? 'h-16 w-16' : 'h-12 w-12',
           )}
-          role='slider'
-          aria-valuenow={value}
-          aria-valuemin={min}
-          aria-valuemax={max}
-          aria-valuetext={valueText}
-          aria-orientation='vertical'
-          {...bindDrag()}
+          valueRaw={value}
+          valueMin={min}
+          valueMax={max}
+          dragSensitivity={0.006}
+          valueRawRoundFn={(x) => x}
+          valueRawDisplayFn={displayValueFn}
+          mapFrom01={mapFrom01}
+          mapTo01={mapTo01}
+          onValueRawChange={onChange}
+          onKeyDown={onKeyDown}
         >
           <div className='absolute h-full w-full rounded-full bg-gray-3'>
             <div
@@ -164,15 +166,15 @@ export function Knob({
               <div className='absolute left-1/2 top-0 h-1/2 w-[2px] -translate-x-1/2 rounded-sm bg-gray-7' />
             </div>
           </div>
-        </div>
-        <label
-          htmlFor={id}
+        </KnobHeadless>
+        <KnobHeadlessOutput
+          htmlFor={knobId}
           onClick={() => {
             openManualInput(true);
           }}
         >
           {valueText}
-        </label>
+        </KnobHeadlessOutput>
       </div>
       {isManualInputActive && (
         <ManualInput
