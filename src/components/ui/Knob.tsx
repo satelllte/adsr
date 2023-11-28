@@ -9,6 +9,9 @@ import {clamp, clamp01, mapFrom01Linear, mapTo01Linear} from '@/utils/math';
 import {isNumberKey} from '@/utils/keyboard';
 import {keyCodes} from '@/constants/key-codes';
 
+const dragSensitivity = 0.006;
+const valueRawRoundFn = (x: number): number => x;
+
 export type KnobProps = {
   isLarge?: boolean;
   title: string;
@@ -150,8 +153,8 @@ export function Knob({
           valueRaw={value}
           valueMin={min}
           valueMax={max}
-          dragSensitivity={0.006}
-          valueRawRoundFn={(x) => x}
+          dragSensitivity={dragSensitivity}
+          valueRawRoundFn={valueRawRoundFn}
           valueRawDisplayFn={displayValueFn}
           mapFrom01={mapFrom01}
           mapTo01={mapTo01}
