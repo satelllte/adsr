@@ -1,3 +1,5 @@
+import {GitHubLink} from '@/components/ui/GitHubLink';
+
 type SynthPageLayoutProps = {
   topPanel?: React.ReactNode;
   children: [React.ReactNode, React.ReactNode];
@@ -14,6 +16,9 @@ export function SynthPageLayout({topPanel, children}: SynthPageLayoutProps) {
       </div>
       <div className='flex w-full items-center justify-center px-4 pt-16'>
         {children[1]}
+      </div>
+      <div className='absolute bottom-2'>
+        <GitHubLink />
       </div>
     </div>
   );
