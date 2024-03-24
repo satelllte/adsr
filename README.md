@@ -1,6 +1,6 @@
 # ADSR
 
-**[adsr.vercel.app](https://adsr.vercel.app/)**
+**[adsr.pages.dev](https://adsr.pages.dev/)**
 
 Simple synthesizer built with [Elementary Audio](https://www.elementary.audio/) framework.
 
